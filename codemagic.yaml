@@ -1,0 +1,164 @@
+# =============================================================
+# 軽井沢クロニクル — Codemagic ビルド設定
+#
+# フェルミ道場と同じ「その場で証明書とプロファイルを作る」方式。
+# 変更点は BUNDLE_ID とアプリ名のみ。署名の仕組みは共通です。
+#
+# リポジトリに必要なファイル：
+#   codemagic.yaml / package.json / capacitor.config.json
+#   app.html / icon-1024.png
+#
+# ★ 事前に App Store Connect で Bundle ID
+#    jp.karuizawachronicle.app のアプリを作成しておくこと。
+# ★ 変数グループ appstore と App Store Connect 連携キーは、
+#    フェルミ道場で作ったものをそのまま再利用できます（同一Apple ID）。
+# =============================================================
+workflows:
+  ios-release:
+    name: 軽井沢クロニクル iOS リリース
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+
+    environment:
+      # CERTIFICATE_PRIVATE_KEY を含む変数グループ（フェルミと共通で可）
+      groups:
+        - appstore
+
+      xcode: latest          # Xcode 26 以降（2026年4月28日以降の提出要件）
+      node: 20
+      cocoapods: default
+
+      vars:
+        BUNDLE_ID: "jp.karuizawachronicle.app"
+        XCODE_WORKSPACE: "ios/App/App.xcworkspace"
+        XCODE_SCHEME: "App"
+
+    integrations:
+      # フェルミ道場で登録した App Store Connect キーをそのまま使えます
+      app_store_connect: FermiDojoKey
+
+    scripts:
+      - name: 依存パッケージを入れる
+        script: |
+          npm install
+
+      - name: アプリ本体を配置
+        script: |
+          mkdir -p www
+          cp app.html www/index.html
+          ls -la www/
+
+      - name: iOSプロジェクトを生成
+        script: |
+          if [ -d "ios/App" ]; then
+            echo "既存のiOSプロジェクトを同期します"
+            npx cap sync ios
+          else
+            echo "iOSプロジェクトを新規生成します"
+            npx cap add ios
+          fi
+
+      - name: アイコン・画面向き・対応端末を設定
+        script: |
+          # アプリアイコン（1024px・透過なし）
+          cp icon-1024.png ios/App/App/Assets.xcassets/AppIcon.appiconset/AppIcon-512@2x.png
+          for f in ios/App/App/Assets.xcassets/Splash.imageset/*.png; do
+            [ -e "$f" ] && cp icon-1024.png "$f"
+          done
+
+          python3 - <<'PY'
+          import re, plistlib
+
+          # iPhone 専用にする（iPad対応にすると縦固定アプリはマルチタスク要件で弾かれる）
+          p = 'ios/App/App.xcodeproj/project.pbxproj'
+          t = open(p, encoding='utf-8').read()
+          t = t.replace('TARGETED_DEVICE_FAMILY = "1,2";', 'TARGETED_DEVICE_FAMILY = "1";')
+          # 最低OSを15.0へ
+          t = re.sub(r'IPHONEOS_DEPLOYMENT_TARGET = [^;]+;', 'IPHONEOS_DEPLOYMENT_TARGET = 15.0;', t)
+          open(p, 'w', encoding='utf-8').write(t)
+
+          # CocoaPods 側の最低OSも揃える
+          p = 'ios/App/Podfile'
+          t = open(p, encoding='utf-8').read()
+          t = re.sub(r"platform :ios, '[^']+'", "platform :ios, '15.0'", t)
+          open(p, 'w', encoding='utf-8').write(t)
+
+          # 縦向き固定。iPhone専用なので iPad 用の指定は削除する
+          p = 'ios/App/App/Info.plist'
+          pl = plistlib.load(open(p, 'rb'))
+          pl['UISupportedInterfaceOrientations'] = ['UIInterfaceOrientationPortrait']
+          pl.pop('UISupportedInterfaceOrientations~ipad', None)
+          plistlib.dump(pl, open(p, 'wb'))
+          print('画面向き:', pl['UISupportedInterfaceOrientations'])
+          PY
+
+      - name: 設定を検証する
+        script: |
+          echo "--- Bundle ID ---"
+          grep -o 'PRODUCT_BUNDLE_IDENTIFIER = [^;]*;' \
+            ios/App/App.xcodeproj/project.pbxproj | sort -u
+          echo "--- 対応端末（1 = iPhoneのみ）---"
+          grep -o 'TARGETED_DEVICE_FAMILY = [^;]*;' \
+            ios/App/App.xcodeproj/project.pbxproj | sort -u
+          echo "--- 最低iOSバージョン ---"
+          grep -o 'IPHONEOS_DEPLOYMENT_TARGET = [^;]*;' \
+            ios/App/App.xcodeproj/project.pbxproj | sort -u
+
+      - name: CocoaPods を入れる
+        script: |
+          cd ios/App
+          pod install
+
+      # ---- ここから署名。証明書とプロファイルを自動で作成する ----
+      - name: キーチェーンを準備
+        script: |
+          keychain initialize
+
+      - name: 署名ファイルを取得（無ければ新規作成）
+        script: |
+          app-store-connect fetch-signing-files "$BUNDLE_ID" \
+            --type IOS_APP_STORE \
+            --create
+
+      - name: 証明書をキーチェーンに登録
+        script: |
+          keychain add-certificates
+
+      - name: プロファイルをプロジェクトに適用
+        script: |
+          xcode-project use-profiles
+
+      - name: ビルド番号を決める
+        script: |
+          TF=$(app-store-connect get-latest-testflight-build-number "$BUNDLE_ID" 2>/dev/null || echo 0)
+          case "$TF" in ''|*[!0-9]*) TF=0 ;; esac
+          NEXT=$((TF + 1))
+          if [ "${BUILD_NUMBER:-0}" -gt "$NEXT" ]; then
+            NEXT=$BUILD_NUMBER
+          fi
+          echo "TestFlight最新: $TF / Codemagic通し番号: ${BUILD_NUMBER:-0} → 採用: $NEXT"
+          cd ios/App
+          agvtool new-version -all $NEXT
+
+      - name: IPA をビルド
+        script: |
+          xcode-project build-ipa \
+            --workspace "$XCODE_WORKSPACE" \
+            --scheme "$XCODE_SCHEME"
+
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
+        submit_to_app_store: false
+
+      email:
+        recipients:
+          - watarin1499@gmail.com
+        notify:
+          success: true
+          failure: true

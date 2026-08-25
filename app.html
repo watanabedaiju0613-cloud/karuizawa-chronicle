@@ -1,0 +1,1196 @@
+<title>軽井沢クロニクル</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<style>
+  :root {
+    --bg: #E4E1D8;
+    --app-bg: #F0EDE4;
+    --surface: #FAF8F1;
+    --surface-2: #FFFFFF;
+    --ink: #241E17;
+    --ink-2: #5A5045;
+    --ink-3: #948a7d;
+    --line: #E1DCCE;
+    --line-strong: #CFC7B4;
+    --accent: #2F6B45;          /* 森の緑 */
+    --accent-soft: #E6EFE5;
+    --accent-ink: #235539;
+    --sepia: #8A6A3F;           /* 歴史の褐色 */
+    --sepia-soft: #EFE6D6;
+    --gold: #A97C2E;
+    --crimson: #B23B3B;
+    --frame: #17140F;
+    --shadow: 30px 60px 120px rgba(40,32,20,.30), 0 8px 30px rgba(40,32,20,.14);
+    --ok: #2F8C57;
+    --ng: #C0472F;
+  }
+  :root:not([data-theme="light"]) {
+    @media (prefers-color-scheme: dark) {
+      --bg: #100D09;
+      --app-bg: #17130D;
+      --surface: #201B14;
+      --surface-2: #29231A;
+      --ink: #EEE8DC;
+      --ink-2: #BAB0A0;
+      --ink-3: #857c6e;
+      --line: #322A20;
+      --line-strong: #3E3428;
+      --accent: #7CBE93;
+      --accent-soft: #24302400;
+      --accent-soft: #243024;
+      --accent-ink: #A6DABA;
+      --sepia: #C6A778;
+      --sepia-soft: #2C2418;
+      --gold: #D6AC63;
+      --crimson: #D9776B;
+      --frame: #050403;
+      --shadow: 30px 60px 120px rgba(0,0,0,.6), 0 8px 30px rgba(0,0,0,.45);
+      --ok: #5CB37E;
+      --ng: #E0836E;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #100D09; --app-bg: #17130D; --surface: #201B14; --surface-2: #29231A;
+    --ink: #EEE8DC; --ink-2: #BAB0A0; --ink-3: #857c6e; --line: #322A20; --line-strong: #3E3428;
+    --accent: #7CBE93; --accent-soft: #243024; --accent-ink: #A6DABA;
+    --sepia: #C6A778; --sepia-soft: #2C2418; --gold: #D6AC63; --crimson: #D9776B;
+    --frame: #050403; --shadow: 30px 60px 120px rgba(0,0,0,.6), 0 8px 30px rgba(0,0,0,.45);
+    --ok: #5CB37E; --ng: #E0836E;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Zen Kaku Gothic New", -apple-system, system-ui, sans-serif;
+    background: radial-gradient(1200px 700px at 50% -12%, color-mix(in srgb, var(--sepia) 14%, var(--bg)), transparent 60%), var(--bg);
+    color: var(--ink); min-height: 100vh;
+    display: flex; flex-direction: column; align-items: center; gap: 20px;
+    padding: 32px 16px 56px; -webkit-font-smoothing: antialiased;
+  }
+  .mincho { font-family: "Zen Old Mincho", "Hiragino Mincho ProN", serif; }
+
+  .stage-caption { text-align: center; max-width: 430px; }
+  .stage-caption .kicker { font-size: 11px; letter-spacing: .28em; text-transform: uppercase; color: var(--sepia); font-weight: 700; }
+  .stage-caption h1 { font-family: "Zen Old Mincho", serif; font-weight: 700; font-size: 26px; margin-top: 8px; letter-spacing: .06em; }
+  .stage-caption p { color: var(--ink-2); font-size: 13px; margin-top: 6px; line-height: 1.6; }
+  .theme-toggle { margin-top: 13px; display: inline-flex; align-items: center; gap: 7px; padding: 7px 14px; border-radius: 999px; border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink-2); font-size: 12px; cursor: pointer; font-family: inherit; }
+  .theme-toggle:hover { border-color: var(--sepia); color: var(--sepia); }
+
+  .phone { width: 390px; max-width: 100%; height: 844px; max-height: 88vh; background: var(--frame); border-radius: 54px; padding: 12px; box-shadow: var(--shadow); position: relative; flex-shrink: 0; }
+  @media (max-width: 430px) { body { padding: 12px 0 30px; } .phone { border-radius: 0; padding: 0; height: 100vh; max-height: none; width: 100%; box-shadow: none; } .stage-caption { padding: 0 16px; } }
+  .screen { position: relative; width: 100%; height: 100%; background: var(--app-bg); border-radius: 44px; overflow: hidden; display: flex; flex-direction: column; }
+  @media (max-width: 430px) { .screen { border-radius: 0; } }
+
+  .statusbar { height: 50px; flex-shrink: 0; position: relative; z-index: 40; display: flex; align-items: center; justify-content: space-between; padding: 0 30px; font-size: 14px; font-weight: 600; color: var(--ink); pointer-events: none; }
+  .statusbar.on-hero { color: #fff; }
+  .island { position: absolute; top: 11px; left: 50%; transform: translateX(-50%); width: 108px; height: 30px; background: #05080a; border-radius: 18px; z-index: 50; }
+  .sb-right { display: flex; align-items: center; gap: 6px; }
+
+  .view { flex: 1; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  .view::-webkit-scrollbar { display: none; }
+  .pad { padding: 4px 18px 26px; }
+
+  .tabbar { flex-shrink: 0; height: 78px; display: flex; background: color-mix(in srgb, var(--surface) 88%, transparent); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border-top: 1px solid var(--line); padding-bottom: 14px; z-index: 30; }
+  .tab { flex: 1; border: none; background: none; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; color: var(--ink-3); font-family: inherit; font-size: 10px; font-weight: 600; padding-top: 8px; transition: color .18s; }
+  .tab svg { width: 23px; height: 23px; }
+  .tab.active { color: var(--accent); }
+
+  .eyebrow { font-size: 10.5px; letter-spacing: .24em; text-transform: uppercase; color: var(--sepia); font-weight: 700; }
+  .section-title { font-family: "Zen Old Mincho", serif; font-size: 20px; font-weight: 700; letter-spacing: .04em; margin: 2px 0; }
+  .muted { color: var(--ink-2); }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 16px; }
+  .chip { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; font-size: 12.5px; font-weight: 600; padding: 7px 13px; border-radius: 999px; border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink-2); cursor: pointer; font-family: inherit; transition: .15s; }
+  .chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .caticon { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; flex-shrink: 0; }
+  .caticon svg { width: 21px; height: 21px; }
+
+  .list-row { display: flex; gap: 13px; align-items: center; width: 100%; background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 13px; cursor: pointer; text-align: left; font-family: inherit; color: var(--ink); transition: .15s; margin-bottom: 11px; }
+  .list-row:hover { border-color: var(--accent); transform: translateY(-1px); }
+  .list-row h4 { font-size: 15.5px; font-weight: 700; }
+  .list-row p { font-size: 12px; color: var(--ink-2); line-height: 1.45; margin-top: 2px; }
+  .list-meta { font-size: 10.5px; color: var(--ink-3); margin-top: 5px; display: flex; align-items: center; gap: 5px; }
+  .heart { margin-left: auto; align-self: flex-start; border: none; background: none; cursor: pointer; padding: 4px; color: var(--ink-3); }
+  .heart.on { color: #C7607F; }
+  .heart svg { width: 20px; height: 20px; display: block; }
+
+  .search { display: flex; align-items: center; gap: 9px; width: 100%; background: var(--surface-2); border: 1px solid var(--line-strong); border-radius: 14px; padding: 11px 14px; margin: 4px 0 14px; }
+  .search input { border: none; background: none; outline: none; flex: 1; font-family: inherit; font-size: 14.5px; color: var(--ink); }
+  .search svg { width: 18px; height: 18px; color: var(--ink-3); flex-shrink: 0; }
+
+  /* hero */
+  .hero { position: relative; margin: -50px -18px 0; padding: 74px 22px 26px; color: #fff; overflow: hidden; }
+  .hero-sky { position: absolute; inset: 0; z-index: 0; }
+  .hero-inner { position: relative; z-index: 2; }
+  .hero .season-tag { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; padding: 5px 11px; border-radius: 999px; background: rgba(255,255,255,.22); backdrop-filter: blur(4px); letter-spacing: .04em; }
+  .hero h2 { font-family: "Zen Old Mincho", serif; font-size: 29px; font-weight: 700; margin-top: 14px; letter-spacing: .05em; text-shadow: 0 2px 20px rgba(0,0,0,.28); }
+  .hero p { font-size: 13px; margin-top: 8px; line-height: 1.6; max-width: 32ch; opacity: .96; }
+  .hero-cta { margin-top: 16px; display: inline-flex; align-items: center; gap: 7px; background: #fff; color: var(--accent-ink); border: none; font-family: inherit; font-weight: 700; font-size: 13.5px; padding: 10px 18px; border-radius: 999px; cursor: pointer; }
+
+  .h-scroll { display: flex; gap: 13px; overflow-x: auto; padding: 2px 18px 6px; margin: 0 -18px; scrollbar-width: none; }
+  .h-scroll::-webkit-scrollbar { display: none; }
+  .feat { flex-shrink: 0; width: 176px; border-radius: 18px; overflow: hidden; border: 1px solid var(--line); background: var(--surface); cursor: pointer; text-align: left; font-family: inherit; color: var(--ink); transition: .15s; }
+  .feat:hover { transform: translateY(-2px); border-color: var(--accent); }
+  .feat .thumb { height: 92px; position: relative; display: grid; place-items: center; }
+  .feat .thumb .yr { position: absolute; left: 10px; bottom: 8px; font-size: 11px; font-weight: 700; color: #fff; font-family: "Zen Old Mincho", serif; letter-spacing: .04em; }
+  .feat .body { padding: 11px 12px 13px; }
+  .feat h4 { font-size: 13.5px; font-weight: 700; line-height: 1.3; }
+  .feat p { font-size: 11px; color: var(--ink-2); margin-top: 3px; line-height: 1.4; }
+
+  .figstrip { display: flex; gap: 11px; overflow-x: auto; padding: 2px 18px 6px; margin: 0 -18px; scrollbar-width: none; }
+  .figstrip::-webkit-scrollbar { display: none; }
+  .figcard { flex-shrink: 0; width: 128px; text-align: center; }
+  .figavatar { width: 70px; height: 70px; border-radius: 50%; margin: 0 auto 8px; display: grid; place-items: center; color: #fff; font-family: "Zen Old Mincho", serif; font-size: 26px; font-weight: 700; box-shadow: 0 4px 12px rgba(0,0,0,.15); }
+  .figcard b { font-size: 13px; display: block; }
+  .figcard span { font-size: 10.5px; color: var(--ink-3); line-height: 1.3; display: block; margin-top: 2px; }
+
+  .shortcut-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; }
+  .shortcut { display: flex; align-items: center; gap: 11px; padding: 14px; border-radius: 16px; border: 1px solid var(--line); background: var(--surface); cursor: pointer; font-family: inherit; color: var(--ink); text-align: left; transition: .15s; }
+  .shortcut:hover { border-color: var(--accent); transform: translateY(-1px); }
+  .shortcut h4 { font-size: 13.5px; font-weight: 700; }
+  .shortcut span { font-size: 10.5px; color: var(--ink-3); }
+
+  /* quiz teaser card on home */
+  .quiz-teaser { position: relative; overflow: hidden; border-radius: 20px; padding: 20px; color: #fff; cursor: pointer; }
+  .quiz-teaser h3 { font-family: "Zen Old Mincho", serif; font-size: 21px; font-weight: 700; }
+  .quiz-teaser p { font-size: 12.5px; margin-top: 6px; opacity: .95; line-height: 1.5; }
+  .quiz-teaser .go { margin-top: 14px; display: inline-flex; align-items: center; gap: 6px; background: #fff; color: var(--accent-ink); font-weight: 700; font-size: 13px; padding: 9px 16px; border-radius: 999px; }
+  .quiz-teaser .best { position: absolute; top: 16px; right: 16px; font-size: 11px; background: rgba(255,255,255,.22); padding: 5px 11px; border-radius: 999px; font-weight: 700; }
+
+  /* TIMELINE */
+  .era-head { display: flex; align-items: center; gap: 10px; margin: 22px 0 8px; }
+  .era-head .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--sepia); }
+  .era-head h3 { font-family: "Zen Old Mincho", serif; font-size: 16px; font-weight: 700; letter-spacing: .05em; }
+  .era-head .rule { flex: 1; height: 1px; background: var(--line); }
+  .tItem { display: flex; gap: 14px; }
+  .tRail { display: flex; flex-direction: column; align-items: center; width: 62px; flex-shrink: 0; }
+  .tYear { font-family: "Zen Old Mincho", serif; font-weight: 700; font-size: 15px; color: var(--sepia); letter-spacing: .02em; }
+  .tGaku { font-size: 9px; color: var(--ink-3); margin-top: 1px; }
+  .tNode { width: 13px; height: 13px; border-radius: 50%; background: var(--surface); border: 3px solid var(--accent); margin: 5px 0 0; z-index: 2; }
+  .tLine { width: 2px; flex: 1; background: var(--line-strong); min-height: 18px; }
+  .tBody { flex: 1; padding-bottom: 20px; }
+  .tCard { background: var(--surface); border: 1px solid var(--line); border-radius: 15px; padding: 13px 14px; cursor: pointer; transition: .15s; }
+  .tCard:hover { border-color: var(--accent); transform: translateY(-1px); }
+  .tCard h4 { font-size: 14.5px; font-weight: 700; }
+  .tCard p { font-size: 12px; color: var(--ink-2); line-height: 1.5; margin-top: 4px; }
+  .tCard .lnk { font-size: 11px; color: var(--accent); font-weight: 700; margin-top: 7px; display: inline-flex; align-items: center; gap: 3px; }
+
+  /* QUIZ */
+  .q-hero { text-align: center; padding: 26px 10px 8px; }
+  .q-badge { width: 78px; height: 78px; border-radius: 22px; margin: 0 auto 14px; display: grid; place-items: center; color: #fff; background: linear-gradient(135deg, var(--accent), var(--sepia)); box-shadow: 0 10px 24px rgba(47,107,69,.28); }
+  .q-badge svg { width: 40px; height: 40px; }
+  .q-hero h2 { font-family: "Zen Old Mincho", serif; font-size: 24px; font-weight: 700; letter-spacing: .04em; }
+  .q-hero p { font-size: 13px; color: var(--ink-2); margin-top: 8px; line-height: 1.6; }
+  .stat-row { display: flex; gap: 10px; margin: 18px 0; }
+  .stat { flex: 1; background: var(--surface); border: 1px solid var(--line); border-radius: 15px; padding: 14px 8px; text-align: center; }
+  .stat b { font-family: "Zen Old Mincho", serif; font-size: 22px; font-weight: 700; color: var(--accent); display: block; }
+  .stat span { font-size: 10.5px; color: var(--ink-3); }
+  .btn-big { width: 100%; padding: 16px; border-radius: 16px; border: none; background: var(--accent); color: #fff; font-family: inherit; font-weight: 700; font-size: 15.5px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: .15s; }
+  .btn-big:hover { filter: brightness(1.05); }
+  .btn-ghost { width: 100%; padding: 13px; border-radius: 14px; border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink-2); font-family: inherit; font-weight: 700; font-size: 13.5px; cursor: pointer; margin-top: 10px; }
+
+  .q-progress { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+  .q-bar { flex: 1; height: 7px; border-radius: 4px; background: var(--line); overflow: hidden; }
+  .q-bar > i { display: block; height: 100%; background: var(--accent); border-radius: 4px; transition: width .3s; }
+  .q-count { font-size: 12px; font-weight: 700; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+  .q-era { display: inline-block; font-size: 10.5px; font-weight: 700; color: var(--sepia); background: var(--sepia-soft); padding: 4px 10px; border-radius: 999px; margin: 16px 0 10px; }
+  .q-question { font-family: "Zen Old Mincho", serif; font-size: 21px; font-weight: 700; line-height: 1.5; letter-spacing: .02em; }
+  .q-opts { margin-top: 20px; display: flex; flex-direction: column; gap: 11px; }
+  .q-opt { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; font-family: inherit; font-size: 14.5px; font-weight: 500; color: var(--ink); background: var(--surface); border: 1.5px solid var(--line-strong); border-radius: 15px; padding: 15px 16px; cursor: pointer; transition: .15s; }
+  .q-opt:hover:not(:disabled) { border-color: var(--accent); }
+  .q-opt .mk { width: 26px; height: 26px; border-radius: 50%; border: 1.5px solid var(--line-strong); display: grid; place-items: center; font-weight: 700; font-size: 13px; color: var(--ink-3); flex-shrink: 0; }
+  .q-opt.correct { border-color: var(--ok); background: color-mix(in srgb, var(--ok) 12%, var(--surface)); }
+  .q-opt.correct .mk { background: var(--ok); border-color: var(--ok); color: #fff; }
+  .q-opt.wrong { border-color: var(--ng); background: color-mix(in srgb, var(--ng) 12%, var(--surface)); }
+  .q-opt.wrong .mk { background: var(--ng); border-color: var(--ng); color: #fff; }
+  .q-opt:disabled { cursor: default; }
+  .q-exp { margin-top: 18px; border-radius: 15px; padding: 15px 16px; background: var(--accent-soft); border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent); animation: fade .3s ease; }
+  .q-exp .verdict { font-weight: 700; font-size: 14px; display: flex; align-items: center; gap: 6px; }
+  .q-exp p { font-size: 13px; color: var(--ink); line-height: 1.7; margin-top: 7px; }
+
+  .result-medal { width: 96px; height: 96px; border-radius: 50%; margin: 8px auto 16px; display: grid; place-items: center; color: #fff; font-family: "Zen Old Mincho", serif; font-size: 40px; font-weight: 700; box-shadow: 0 12px 30px rgba(0,0,0,.2); }
+  .result-score { font-family: "Zen Old Mincho", serif; font-size: 46px; font-weight: 900; color: var(--accent); line-height: 1; }
+  .result-rank { font-family: "Zen Old Mincho", serif; font-size: 22px; font-weight: 700; margin-top: 12px; }
+  .result-note { font-size: 13px; color: var(--ink-2); margin-top: 8px; line-height: 1.6; }
+
+  /* segmented control */
+  .seg { display: flex; gap: 4px; background: var(--surface); border: 1px solid var(--line); border-radius: 13px; padding: 4px; margin: 14px 0; }
+  .seg-btn { flex: 1; border: none; background: none; font-family: inherit; font-size: 13px; font-weight: 700; color: var(--ink-2); padding: 9px 6px; border-radius: 10px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; transition: .15s; }
+  .seg-btn.on { background: var(--accent); color: #fff; }
+
+  /* course card */
+  .crs-card { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 16px; margin-bottom: 13px; cursor: pointer; transition: .15s; }
+  .crs-card:hover { border-color: var(--accent); transform: translateY(-1px); }
+  .crs-badge { font-size: 11px; font-weight: 700; color: var(--accent-ink); background: var(--accent-soft); padding: 4px 11px; border-radius: 999px; }
+  .crs-metrics { display: flex; gap: 14px; margin-top: 11px; font-size: 11.5px; color: var(--sepia); font-weight: 600; flex-wrap: wrap; }
+  .crs-metrics span { display: inline-flex; align-items: center; gap: 4px; }
+
+  /* trip game */
+  .trip-path { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 2px; margin: 6px 0 4px; }
+  .tp-node { display: flex; flex-direction: column; align-items: center; width: 52px; }
+  .tp-dot { width: 26px; height: 26px; border-radius: 50%; color: #fff; display: grid; place-items: center; font-size: 12px; font-weight: 700; }
+  .tp-name { font-size: 8.5px; color: var(--ink-3); margin-top: 3px; text-align: center; line-height: 1.2; }
+  .tp-link { width: 12px; height: 2px; background: var(--line-strong); margin-bottom: 16px; }
+  .trip-stage { text-align: center; }
+  .ts-scene { position: relative; height: 150px; border-radius: 18px; display: grid; place-items: center; overflow: hidden; }
+  .ts-photo { position: absolute; bottom: 8px; right: 10px; font-size: 9px; color: rgba(255,255,255,.85); background: rgba(0,0,0,.28); padding: 3px 8px; border-radius: 999px; }
+
+  /* photo frame (spot sheet) */
+  .photo-frame { position: relative; height: 190px; border-radius: 16px; overflow: hidden; display: grid; place-items: center; margin-top: 14px; }
+  .photo-frame .ph-note { position: absolute; bottom: 8px; right: 10px; font-size: 9.5px; color: rgba(255,255,255,.9); background: rgba(0,0,0,.3); padding: 3px 9px; border-radius: 999px; }
+
+  /* map / sheet (reused) */
+  .map-wrap { position: relative; border-radius: 20px; overflow: hidden; border: 1px solid var(--line); }
+  .map-wrap svg.terrain { display: block; width: 100%; height: auto; }
+  .pin { position: absolute; transform: translate(-50%, -100%); cursor: pointer; z-index: 2; }
+  .pin-dot { width: 30px; height: 30px; border-radius: 50% 50% 50% 2px; transform: rotate(45deg); display: grid; place-items: center; box-shadow: 0 3px 8px rgba(0,0,0,.3); border: 2px solid #fff; }
+  .pin-dot svg { width: 15px; height: 15px; transform: rotate(-45deg); color: #fff; }
+  .pin.juku { z-index: 3; }
+  .juku-dot { width: 26px; height: 26px; border-radius: 8px; background: var(--sepia); color: #fff; border: 2px solid #fff; display: grid; place-items: center; font-size: 12px; font-weight: 700; font-family: "Zen Old Mincho", serif; box-shadow: 0 3px 8px rgba(0,0,0,.3); transform: translateY(2px); }
+  .juku-lbl { position: absolute; top: 30px; left: 50%; transform: translateX(-50%); white-space: nowrap; font-size: 9px; font-weight: 700; color: var(--sepia); background: color-mix(in srgb, var(--surface) 90%, transparent); padding: 1px 5px; border-radius: 5px; }
+  .map-wrap.tall svg.terrain { height: 360px; }
+  .map-legend { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 10px; font-size: 11px; color: var(--ink-2); }
+  .map-legend span { display: inline-flex; align-items: center; gap: 5px; }
+  .lg-road { width: 16px; height: 0; border-top: 2px dashed var(--sepia); }
+  .lg-juku { width: 14px; height: 14px; border-radius: 4px; background: var(--sepia); }
+  .lg-spot { width: 12px; height: 12px; border-radius: 50%; background: var(--accent); }
+
+  .sheet-scrim { position: absolute; inset: 0; z-index: 60; background: rgba(15,12,8,.5); opacity: 0; pointer-events: none; transition: opacity .28s; backdrop-filter: blur(2px); }
+  .sheet-scrim.open { opacity: 1; pointer-events: auto; }
+  .sheet { position: absolute; left: 0; right: 0; bottom: 0; z-index: 61; height: 92%; background: var(--app-bg); border-radius: 26px 26px 0 0; overflow: hidden; transform: translateY(102%); transition: transform .34s cubic-bezier(.32,.72,0,1); display: flex; flex-direction: column; }
+  .sheet.open { transform: translateY(0); }
+  .sheet-grab { position: absolute; top: 9px; left: 50%; transform: translateX(-50%); width: 40px; height: 5px; border-radius: 3px; background: rgba(255,255,255,.6); z-index: 5; }
+  .sheet-close { position: absolute; top: 14px; right: 16px; z-index: 6; width: 32px; height: 32px; border-radius: 50%; border: none; background: rgba(0,0,0,.32); color: #fff; cursor: pointer; display: grid; place-items: center; }
+  .sheet-close svg { width: 16px; height: 16px; }
+  .sheet-scroll { overflow-y: auto; scrollbar-width: none; }
+  .sheet-scroll::-webkit-scrollbar { display: none; }
+  .sheet-hero { height: 176px; position: relative; display: grid; place-items: center; color: #fff; }
+  .sheet-hero .big { width: 62px; height: 62px; opacity: .92; }
+  .sheet-hero .era-tag { position: absolute; bottom: 14px; left: 20px; font-size: 11px; font-weight: 700; background: rgba(0,0,0,.32); padding: 4px 10px; border-radius: 999px; }
+  .sheet-pad { padding: 20px 20px 40px; }
+  .sheet-pad h2 { font-family: "Zen Old Mincho", serif; font-size: 24px; font-weight: 700; letter-spacing: .03em; }
+  .reading { font-size: 11px; color: var(--ink-3); }
+  .tag-strip { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0; }
+  .tagpill { font-size: 11px; font-weight: 700; padding: 5px 11px; border-radius: 999px; display: inline-flex; align-items: center; gap: 5px; }
+  .body-text p { font-size: 14px; line-height: 1.85; color: var(--ink); margin-top: 14px; }
+  .info-card { display: flex; gap: 12px; align-items: flex-start; padding: 14px; border-radius: 14px; background: var(--surface); border: 1px solid var(--line); margin-top: 12px; }
+  .info-card svg { width: 20px; flex-shrink: 0; }
+  .info-card h5 { font-size: 13px; font-weight: 700; }
+  .info-card p { font-size: 12px; color: var(--ink-2); margin-top: 3px; line-height: 1.5; }
+  .divider { height: 1px; background: var(--line); margin: 22px 0 4px; }
+  .related { display: flex; gap: 11px; align-items: center; padding: 12px; border-radius: 13px; background: var(--surface); border: 1px solid var(--line); cursor: pointer; margin-top: 10px; font-family: inherit; color: var(--ink); width: 100%; text-align: left; }
+  .btn-primary { width: 100%; margin-top: 16px; padding: 13px; border-radius: 13px; border: none; background: var(--accent-soft); color: var(--accent-ink); font-family: inherit; font-weight: 700; font-size: 13.5px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 7px; text-decoration: none; }
+
+  .empty { text-align: center; color: var(--ink-3); font-size: 13px; padding: 40px 20px; }
+  .fade { animation: fade .28s ease; }
+  @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  @keyframes pop { 0% { transform: scale(.7); opacity: 0; } 60% { transform: scale(1.08); } 100% { transform: scale(1); opacity: 1; } }
+  .pop { animation: pop .4s cubic-bezier(.32,.72,0,1); }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+
+<style id="native-app">
+/* ---- Capacitor full-screen app overrides ---- */
+html, body { height: 100%; }
+body { padding: 0 !important; margin: 0 !important; gap: 0 !important;
+       display: block !important; background: var(--app-bg) !important;
+       min-height: 100vh; min-height: 100dvh; }
+.stage-caption { display: none !important; }
+.phone { width: 100% !important; max-width: none !important;
+         height: 100vh !important; height: 100dvh !important; max-height: none !important;
+         border-radius: 0 !important; padding: 0 !important; box-shadow: none !important; }
+.island { display: none !important; }
+.screen { border-radius: 0 !important; }
+/* the device's real status bar overlays this zone; hide the mock clock/battery */
+#clock, .statusbar .sb-right { display: none !important; }
+.statusbar { height: max(46px, env(safe-area-inset-top)) !important; }
+.hero { margin-top: calc(-1 * max(46px, env(safe-area-inset-top))) !important; }
+/* keep the tab bar clear of the home indicator */
+.tabbar { padding-bottom: max(14px, env(safe-area-inset-bottom)) !important; }
+</style>
+<div class="stage-caption">
+  <div class="kicker">Karuizawa · 中山道から現代まで</div>
+  <h1 class="mincho">軽井沢クロニクル</h1>
+  <p>中山道の宿場から避暑地、そして現代へ。街道地図・年表・読み物に、歴史クイズと「中山道の旅」ゲームを加えた試作版です。スマホでそのまま操作できます。</p>
+  <button class="theme-toggle" id="themeBtn">◐ 表示テーマを切り替え</button>
+</div>
+
+<div class="phone">
+  <div class="island"></div>
+  <div class="screen">
+    <div class="statusbar" id="statusbar">
+      <span id="clock">9:41</span>
+      <span class="sb-right">
+        <svg width="17" height="12" viewBox="0 0 17 12" fill="currentColor"><rect x="0" y="7" width="3" height="5" rx="1"/><rect x="4.5" y="4.5" width="3" height="7.5" rx="1"/><rect x="9" y="2" width="3" height="10" rx="1"/><rect x="13.5" y="0" width="3" height="12" rx="1"/></svg>
+        <svg width="24" height="12" viewBox="0 0 24 12" fill="none"><rect x="1" y="1" width="20" height="10" rx="3" stroke="currentColor" stroke-width="1.2" opacity=".5"/><rect x="2.5" y="2.5" width="15" height="7" rx="1.6" fill="currentColor"/><rect x="22" y="4" width="1.6" height="4" rx="1" fill="currentColor" opacity=".5"/></svg>
+      </span>
+    </div>
+    <div class="view" id="view"></div>
+    <nav class="tabbar" id="tabbar"></nav>
+  </div>
+
+  <div class="sheet-scrim" id="scrim"></div>
+  <div class="sheet" id="sheet">
+    <div class="sheet-grab"></div>
+    <button class="sheet-close" id="sheetClose" aria-label="閉じる">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+    <div class="sheet-scroll" id="sheetScroll"></div>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+const I = {
+  home:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 11l8-7 8 7"/><path d="M6 10v9h12v-9"/></svg>',
+  time:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 7v5l3 2"/><circle cx="12" cy="12" r="9"/></svg>',
+  book:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 5a2 2 0 012-2h12v16H6a2 2 0 00-2 2V5z"/><path d="M18 3v18"/></svg>',
+  quiz:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M9.2 9.2a2.8 2.8 0 015.4 1c0 1.9-2.8 2.5-2.8 4"/><circle cx="11.8" cy="17.3" r="1.1" fill="currentColor" stroke="none"/></svg>',
+  pin:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 21s7-6.3 7-11a7 7 0 10-14 0c0 4.7 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>',
+  map:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/></svg>',
+  leaf:  '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 20c8 2 15-4 15-13 0 0-3-1-7 0S4 12 4 20z"/></svg>',
+  columns:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l9 5H3l9-5zM5 9h2v9H5zM11 9h2v9h-2zM17 9h2v9h-2zM3 19h18v2H3z"/></svg>',
+  cross: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 2h4v6h6v4h-6v10h-4V12H4V8h6z"/></svg>',
+  fork:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 3v7a2 2 0 004 0V3M8 12v9M18 3c-2 0-3 2-3 5s1 4 3 4v9"/></svg>',
+  bag:   '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 7h12l1 14H5L6 7z"/></svg>',
+  drop:  '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3s6 7 6 11a6 6 0 01-12 0c0-4 6-11 6-11z"/></svg>',
+  mtn:   '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l5 9-3 0-2-3-2 3-3 0zM3 20l4-7 3 4-2 3zM21 20l-4-7-3 4 2 3z"/></svg>',
+  sign:  '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M11 2h2v3h6l2 3-2 3h-6v11h-2V11H5L3 8l2-3h6z"/></svg>',
+  bldg:  '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 21V5l8-3 8 3v16h-6v-5h-4v5z"/></svg>',
+  walk:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="13" cy="4" r="2"/><path d="M11 8l3 2 2 4M11 8l-2 5 3 3 1 5M14 10l-1 4"/></svg>',
+  train: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="5" y="4" width="14" height="13" rx="3"/><path d="M5 11h14M9 21l-2-2M15 21l2-2"/><circle cx="9" cy="14" r="1" fill="currentColor"/><circle cx="15" cy="14" r="1" fill="currentColor"/></svg>',
+  music: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M9 18V5l10-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="16" cy="16" r="3"/></svg>',
+  medal: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="14" r="6"/><path d="M9 8L6 2M15 8l3-6M12 12v4M10.5 14h3"/></svg>',
+  search:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>',
+  chev:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg>',
+  bulb:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M9 18h6M10 21h4M12 3a6 6 0 00-4 10c1 1 1.5 2 1.5 3h5c0-1 .5-2 1.5-3A6 6 0 0012 3z"/></svg>',
+  ext:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 01-1 1H5a1 1 0 01-1-1V7a1 1 0 011-1h5"/></svg>',
+  heart: (on)=>`<svg viewBox="0 0 24 24" fill="${on?'currentColor':'none'}" stroke="currentColor" stroke-width="1.8"><path d="M12 20s-7-4.6-9.2-9C1.3 8 3 4.5 6.3 4.5c2 0 3.2 1.3 3.7 2.2.5-.9 1.7-2.2 3.7-2.2 3.3 0 5 3.5 3.5 6.5C19 15.4 12 20 12 20z"/></svg>`,
+  check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg>',
+  x:     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+  refresh:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M20 11a8 8 0 10-1.5 5"/><path d="M20 4v7h-7"/></svg>',
+  play:  '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 5l12 7-12 7z"/></svg>',
+  game:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="6" width="18" height="12" rx="3"/><path d="M7 10v4M5 12h4"/><circle cx="16" cy="11" r="1.1" fill="currentColor"/><circle cx="18" cy="14" r="1.1" fill="currentColor"/></svg>',
+  flag:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></svg>',
+  torii: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 5c3 1 15 1 18 0l-1 3H4L3 5zM5 8h2v11H5zM17 8h2v11h-2zM4 10h16v2H4z"/></svg>',
+};
+
+const CAT = {
+  nature:{label:"自然・景観",icon:I.leaf,color:"#2F8C57"},
+  history:{label:"歴史・建築",icon:I.columns,color:"#8A6D3B"},
+  church:{label:"教会",icon:I.cross,color:"#7A6FA6"},
+  gourmet:{label:"グルメ・カフェ",icon:I.fork,color:"#C0611F"},
+  shopping:{label:"ショッピング",icon:I.bag,color:"#C13B6B"},
+  onsen:{label:"温泉",icon:I.drop,color:"#2E86A8"},
+};
+
+/* ---------------- SPOTS (tourism retained) ---------------- */
+const SPOTS = [
+  {id:"kumoba",name:"雲場池",reading:"くもばいけ",cat:"nature",area:"旧軽井沢",summary:"「スワンレイク」とも呼ばれる紅葉の名所",lat:36.35670,lon:138.62050,season:"新緑・紅葉",desc:"御膳水を水源とする細長い池で、水面に木々を映す姿が美しく、通称「スワンレイク」。一周約20分の遊歩道が整備され、特に10月下旬〜11月上旬の紅葉は圧巻です。",tips:"朝の風のない時間帯は水鏡がきれい。"},
+  {id:"ginza",name:"旧軽井沢銀座通り",reading:"きゅうかるいざわぎんざどおり",cat:"shopping",area:"旧軽井沢",summary:"老舗と食べ歩きの定番メインストリート",lat:36.35570,lon:138.63500,season:"通年",desc:"旧軽井沢のメインストリート。ジャム、ソーセージ、パン、ジェラートなどの老舗が軒を連ねます。避暑に訪れた外国人や文化人が愛した店も多く、レトロな雰囲気が残ります。",tips:"裏道の教会や別荘散策とセットで。"},
+  {id:"stpaul",name:"聖パウロカトリック教会",reading:"せいぱうろかとりっくきょうかい",cat:"church",area:"旧軽井沢",summary:"レーモンド設計、三角屋根の名建築",lat:36.35490,lon:138.63290,season:"通年",desc:"1935年に建てられた、アントニン・レーモンド設計の木造の教会。急勾配の三角屋根が特徴で、堀辰雄や川端康成の作品にも登場しました。",tips:"礼拝・挙式時は見学不可のことも。"},
+  {id:"shaw",name:"軽井沢ショー記念礼拝堂",reading:"かるいざわしょーきねんれいはいどう",cat:"church",area:"旧軽井沢",summary:"避暑地・軽井沢発祥の地に建つ最古の教会",lat:36.35770,lon:138.63730,season:"通年",desc:"軽井沢を避暑地として紹介したカナダ人宣教師ショーが1895年に建てた、軽井沢最古の教会。傍らには彼の別荘を復元した「ショーハウス記念館」があります。",tips:"避暑地文化の原点。記念館もあわせて。"},
+  {id:"mampei",name:"万平ホテル",reading:"まんぺいほてる",cat:"history",area:"旧軽井沢",summary:"旅籠「亀屋」を源流とするクラシックホテル",lat:36.35200,lon:138.63600,season:"通年",desc:"ルーツは1764年頃創業の旅籠「亀屋」。明治期に外国人避暑客向けのホテルへと発展し、日本を代表するクラシックホテルのひとつに。1976年からはジョン・レノン一家も滞在しました。",tips:"名物ロイヤルミルクティーはレノン由来。"},
+  {id:"usui",name:"碓氷峠見晴台",reading:"うすいとうげみはらしだい",cat:"nature",area:"旧軽井沢",summary:"長野・群馬県境の大パノラマ展望台",lat:36.36200,lon:138.65400,season:"紅葉",desc:"標高約1,200mの碓氷峠にある展望台。晴れた日には妙義山や関東平野を一望でき、紅葉の名所としても有名。峠の熊野神社もあわせて参拝できます。",tips:"難所・碓氷峠は宿場町時代の要所。"},
+  {id:"shiraito",name:"白糸の滝",reading:"しらいとのたき",cat:"nature",area:"北軽井沢",summary:"浅間山の伏流水が糸のように流れる名瀑",lat:36.39600,lon:138.58500,season:"新緑・紅葉・冬",desc:"幅約70mにわたって、浅間山の伏流水（地下水）が幾筋もの糸のように流れ落ちる滝。水量が安定し夏でもひんやり。冬にはライトアップも。",tips:"水源は人工ではなく浅間山の地下水。"},
+  {id:"onioshi",name:"鬼押出し園",reading:"おにおしだしえん",cat:"nature",area:"北軽井沢",summary:"天明の大噴火が生んだ溶岩の奇観",lat:36.43600,lon:138.53300,season:"初夏・秋",desc:"1783年（天明3年）の浅間山大噴火で流れ出た溶岩が固まってできた奇勝。黒い溶岩原の間に遊歩道が整備され、火山のエネルギーを間近に感じられます。",tips:"軽井沢の歴史を変えた噴火の痕跡。"},
+  {id:"harunire",name:"ハルニレテラス",reading:"はるにれてらす",cat:"gourmet",area:"中軽井沢",summary:"星野エリアの川沿いに広がる木立の街",lat:36.34800,lon:138.59660,season:"通年",desc:"中軽井沢・星野エリアの湯川沿いに、100本超のハルニレの木立を生かして作られた商業施設。カフェやレストランが木のデッキでつながります。",tips:"併設「トンボの湯」で日帰り温泉も。"},
+  {id:"stone",name:"石の教会 内村鑑三記念堂",reading:"いしのきょうかい",cat:"church",area:"中軽井沢",summary:"内村鑑三を記念するオーガニック建築",lat:36.34860,lon:138.59050,season:"通年",desc:"「無教会主義」を唱えた思想家・内村鑑三の精神を記念して建てられた教会。石のアーチとガラスが連なる独特の空間が、自然の光と緑を内部に取り込みます。",tips:"地下に内村鑑三の資料展示。"},
+  {id:"prince",name:"軽井沢・プリンスショッピングプラザ",reading:"ぷりんすしょっぴんぐぷらざ",cat:"shopping",area:"南軽井沢",summary:"軽井沢駅すぐの大規模アウトレット",lat:36.33890,lon:138.63490,season:"通年",desc:"軽井沢駅南口に隣接する国内最大級のアウトレット。広大な芝生広場や池を配した開放的なつくりで、駅直結でアクセス抜群です。",tips:"1997年の新幹線開業で駅前が発展。"},
+  {id:"taliesin",name:"軽井沢タリアセン",reading:"かるいざわたりあせん",cat:"history",area:"南軽井沢",summary:"塩沢湖畔に歴史的建造物が点在する公園",lat:36.32300,lon:138.60300,season:"初夏・紅葉",desc:"塩沢湖を囲む自然公園。旧軽井沢から移築された「旧朝吹山荘（睡鳩荘）」など、別荘建築を間近に見られます。",tips:"睡鳩荘の内部見学は必見。"},
+];
+const spotById = id => SPOTS.find(s=>s.id===id);
+
+/* ---------------- HISTORY articles ---------------- */
+const HISTORY = [
+  {id:"shukuba",title:"中山道の宿場町「軽井沢宿」",era:"江戸時代",icon:I.sign,summary:"避暑地となる前、軽井沢は中山道の宿場町でした。",related:["usui","mampei"],
+   body:["現在は避暑地・別荘地として知られる軽井沢ですが、その歴史は江戸時代の宿場町にさかのぼります。江戸と京都を結ぶ中山道の宿場として、軽井沢宿・沓掛宿・追分宿の三つ（浅間三宿）が置かれ、旅人や物資が行き交う交通の要衝でした。",
+     "とりわけ難所として知られたのが東の碓氷峠です。急峻な峠を越える旅人にとって、ふもとの軽井沢宿は重要な休息地でした。追分宿は北国街道との分岐点にあたり、分岐の宿として栄えました。",
+     "明治に入り鉄道や新しい道路が整備されると宿場町としての役割は薄れます。しかし、その静けさと涼しい気候が外国人宣教師たちの目にとまり、軽井沢は「避暑地」として第二の人生を歩み始めます。"]},
+  {id:"shaw",title:"避暑地・軽井沢の誕生 — 宣教師ショーの発見",era:"明治19年（1886年）〜",icon:I.walk,summary:"ショーが「屋根のない病院」と称し、避暑地の礎を築きました。",related:["shaw"],
+   body:["軽井沢を避暑地として世に知らしめたのは、カナダ人の聖公会宣教師アレクサンダー・クロフト・ショーでした。1886年（明治19年）、ショーは友人ディクソンとともに軽井沢を訪れ、その涼しく清らかな気候に深く魅了されます。",
+     "ショーは軽井沢を「屋根のない病院」と表現し、蒸し暑い日本の夏を避ける理想の地として宣教師や外国人仲間に紹介しました。1888年には自らの別荘を構え、これが軽井沢の別荘第一号とされています。1895年には礼拝堂（現在のショー記念礼拝堂）を建てました。",
+     "ショーの紹介をきっかけに外国人が次々と別荘を建て、軽井沢は国際的な避暑地へと発展します。木立に点在する別荘、静かな教会、涼を楽しむ文化 — 今日の原風景の出発点は、この一人の宣教師の「発見」にありました。"]},
+  {id:"villa",title:"別荘文化と文人たちの軽井沢",era:"明治後期〜昭和",icon:I.book,summary:"政財界人や作家が集い、別荘文化と文学が育まれました。",related:["mampei","ginza"],
+   body:["外国人によって始まった避暑地文化は、やがて日本の政財界人や知識人、作家たちへと広がります。明治後期から昭和にかけて数多くの別荘が建てられ、夏には各界の人々が集う社交の場となりました。",
+     "文学の舞台としても軽井沢は重要です。堀辰雄は軽井沢を愛し、『風立ちぬ』『美しい村』にこの地の風景を描きました。室生犀星や川端康成、正宗白鳥ら多くの文人が滞在し、避暑地の空気の中で創作に打ち込みました。",
+     "テニスや音楽、教会での集いといった西洋由来の過ごし方も定着し、上品でおおらかな「避暑地の文化」が形づくられました。自然と調和した街並みを保とうとする姿勢も、この時代に育まれた美意識です。"]},
+  {id:"hotels",title:"クラシックホテルと西洋文化の窓口",era:"明治27年（1894年）〜",icon:I.bldg,summary:"万平ホテルや旧三笠ホテルが西洋の暮らしを伝えました。",related:["mampei"],
+   body:["避暑客の増加とともに西洋式ホテルが誕生します。万平ホテルのルーツは1764年頃創業の旅籠「亀屋」。1894年に「亀屋ホテル」として開業し、のちに「万平ホテル」として日本を代表するクラシックホテルへと発展しました。木造の建築とロイヤルミルクティーは今も受け継がれています。",
+     "1906年（明治39年）開業の旧三笠ホテルは、日本人建築家・岡田時太郎による純西洋風木造建築。渋沢栄一ら著名人が多く宿泊したことから「軽井沢の鹿鳴館」と呼ばれ、国の重要文化財に指定されています（保存修理のため見学可否は時期による）。",
+     "これらのホテルは単なる宿泊施設ではなく、西洋の食・建築・社交のスタイルを日本に伝える「窓口」でした。軽井沢がハイカラで国際的な空気をまとった背景には、こうしたホテルの存在があったのです。"]},
+  {id:"church",title:"軽井沢と教会 — 祈りが息づく高原",era:"明治〜現代",icon:I.cross,summary:"避暑地の歩みとともに個性的な教会が数多く建てられました。",related:["shaw","stpaul","stone"],
+   body:["宣教師ショーによって拓かれた軽井沢は、避暑地の発展とともに数多くの教会が建てられ、「教会の街」としての一面を持つようになりました。信仰の場であると同時に、避暑に訪れた人々の心の拠り所でもありました。",
+     "ショー記念礼拝堂は1895年建立の軽井沢最古の教会で、避暑地文化の原点です。1935年の聖パウロカトリック教会はアントニン・レーモンドによる三角屋根の木造建築。中軽井沢の「石の教会 内村鑑三記念堂」は石とガラスのオーガニック建築として知られます。",
+     "これらの教会はそれぞれ時代や思想を映しながら、軽井沢の風景に静けさと祈りの気配を添えています。挙式や礼拝のない時間帯には見学できる教会も多く、散策の目的地として親しまれています。"]},
+  {id:"asama",title:"浅間山とともに生きる — 火山が刻んだ風景",era:"天明3年（1783年）ほか",icon:I.mtn,summary:"天明の大噴火は「鬼押出し」を生み、歴史に刻まれました。",related:["onioshi","shiraito"],
+   body:["軽井沢の北にそびえる浅間山は、今も活動を続ける日本有数の活火山です。その姿は軽井沢のシンボルであると同時に、この地の歴史と風景を形づくってきた存在でもあります。",
+     "なかでも1783年（天明3年）の大噴火は甚大で、流れ出た溶岩が固まって「鬼押出し」と呼ばれる奇観を生みました。黒くごつごつとした溶岩原が広がる鬼押出し園は、火山のエネルギーを間近に体感できる場所です。",
+     "一方で浅間山の火山活動は、白糸の滝を生む豊かな伏流水や水はけのよい高原の土壌といった恵みももたらしました。避暑地としての涼やかな気候も、この高原の地形と無関係ではありません。"]},
+  {id:"kaido",title:"中山道と碓氷峠 — 旧道をたどる",era:"江戸〜明治",icon:I.sign,summary:"浅間三宿と碓氷峠。街道が軽井沢の骨格をつくりました。",related:["usui","mampei"],
+   body:["軽井沢の町のかたちは、中山道という一本の街道からできています。西から追分宿・沓掛宿・軽井沢宿と続く「浅間三宿」が東西に並び、その東の端に難所・碓氷峠が控えていました。旅人はこの三宿で草鞋を替え、峠越えに備えたのです。",
+     "追分宿は、中山道と北国街道が分かれる分岐点。旅人や物資が集まり、飯盛旅籠が軒を連ねる大きな宿場として賑わいました。「信濃追分」の地名や分去れ（わかされ）の道標が、当時のにぎわいを今に伝えます。沓掛宿（現在の中軽井沢）、軽井沢宿（現在の旧軽井沢）も、それぞれ峠を控えた休息の地でした。",
+     "東の碓氷峠は、標高差の大きい中山道最大級の難所。峠には熊野神社が長野・群馬の県境をまたいで鎮座し、旅の安全が祈られました。明治に入るとこの峠に沿ってアプト式鉄道が敷かれ、のちに碓氷第三橋梁（めがね橋）などの煉瓦アーチが築かれます。街道の道筋は、そのまま近代の鉄道へと引き継がれていきました。",
+     "宿場の役割は鉄道や新道の開通とともに薄れましたが、旧軽井沢銀座はかつての軽井沢宿の街道筋にあたり、追分宿には本陣跡や旧旅籠が残ります。今の軽井沢を歩くことは、そのまま旧中山道をたどることでもあるのです。"]},
+  {id:"gendai",title:"通年リゾートへ — 新幹線・五輪・G7",era:"平成〜令和",icon:I.train,summary:"避暑地は交通の進化とともに世界に開かれた通年リゾートへ。",related:["prince"],
+   body:["夏の避暑地として知られた軽井沢は、現代に入って大きく姿を変えます。その原動力となったのが交通の進化でした。1997年（平成9年）の長野（北陸）新幹線の開業により、東京から軽井沢はおよそ1時間で結ばれ、夏だけでなく四季を通じて人が訪れる「通年リゾート」へと変わっていきます。",
+     "1998年（平成10年）の長野オリンピックでは、軽井沢がカーリング競技の会場となりました。かつてスケートの町でもあった軽井沢が、冬のウィンタースポーツの舞台として世界に発信された出来事です。",
+     "そして2023年（令和5年）4月には、G7長野県軽井沢外務大臣会合が開催されました。世界の外相が集うこの会合は、静かな避暑地・軽井沢が国際外交の舞台にもなりうることを示しました。宣教師ショーが「屋根のない病院」と呼んだ高原は、いまや歴史・自然・国際性を併せ持つ、日本を代表するリゾートへと成長したのです。"]},
+];
+const historyById = id => HISTORY.find(h=>h.id===id);
+
+/* ---------------- TIMELINE (facts verified) ---------------- */
+const TIMELINE = [
+  {group:"江戸時代", items:[
+    {year:"1764", gaku:"明和元", title:"旅籠「亀屋」創業", icon:I.bldg, note:"のちの万平ホテルの源流となる旅籠が旧軽井沢に開かれる。", hist:"shukuba"},
+    {year:"1783", gaku:"天明3", title:"浅間山の大噴火", icon:I.mtn, note:"「天明の大噴火」。流れ出た溶岩が「鬼押出し」を生み、周辺に大きな被害をもたらした。", hist:"asama", spot:"onioshi"},
+    {year:"江戸期", gaku:"", title:"中山道の宿場町として繁栄", icon:I.sign, note:"軽井沢宿・沓掛宿・追分宿の浅間三宿が置かれ、碓氷峠を越える旅人で賑わう。", hist:"shukuba"},
+  ]},
+  {group:"明治 — 避暑地の誕生", items:[
+    {year:"1886", gaku:"明治19", title:"宣教師ショー、軽井沢を訪れる", icon:I.walk, note:"カナダ人宣教師A.C.ショーが来訪し、涼しい気候を「屋根のない病院」と評した。避暑地・軽井沢の出発点。", hist:"shaw", spot:"shaw"},
+    {year:"1888", gaku:"明治21", title:"別荘第一号が建つ", icon:I.home, note:"ショーが自らの別荘を構える。軽井沢に別荘文化が芽生える。", hist:"shaw"},
+    {year:"1893", gaku:"明治26", title:"横川〜軽井沢にアプト式鉄道が開通", icon:I.train, note:"難所・碓氷峠を越える信越線が開通。東京から避暑客が訪れやすくなった。"},
+    {year:"1894", gaku:"明治27", title:"亀屋ホテル（万平ホテル）開業", icon:I.bldg, note:"旅籠・亀屋が外国人避暑客向けのホテルへ。のちの万平ホテルへと発展する。", hist:"hotels", spot:"mampei"},
+    {year:"1895", gaku:"明治28", title:"ショー記念礼拝堂が建てられる", icon:I.cross, note:"軽井沢最古の教会。避暑地文化と信仰の拠点となった。", hist:"church", spot:"shaw"},
+    {year:"1906", gaku:"明治39", title:"旧三笠ホテル開業", icon:I.bldg, note:"日本人建築家・岡田時太郎の純西洋風木造建築。著名人が集い「軽井沢の鹿鳴館」と呼ばれた。", hist:"hotels"},
+  ]},
+  {group:"大正・昭和 — 文化の成熟", items:[
+    {year:"1920s〜", gaku:"大正〜昭和", title:"別荘文化と文学の隆盛", icon:I.book, note:"堀辰雄・室生犀星・川端康成ら文人が集う。『風立ちぬ』など軽井沢を舞台にした作品が生まれた。", hist:"villa"},
+    {year:"1935", gaku:"昭和10", title:"聖パウロカトリック教会 完成", icon:I.cross, note:"建築家アントニン・レーモンド設計。三角屋根が軽井沢の象徴のひとつに。", hist:"church", spot:"stpaul"},
+    {year:"1976", gaku:"昭和51", title:"ジョン・レノン一家が滞在", icon:I.music, note:"以後1980年頃まで毎夏、万平ホテルなどに滞在。ロイヤルミルクティーの逸話が生まれた。", spot:"mampei"},
+  ]},
+  {group:"現代", items:[
+    {year:"1997", gaku:"平成9", title:"長野（北陸）新幹線が開業", icon:I.train, note:"軽井沢駅に新幹線が停車。東京から約1時間で結ばれ、通年型リゾートへと変わっていく。", hist:"gendai", spot:"prince"},
+    {year:"1998", gaku:"平成10", title:"長野オリンピック開催", icon:I.medal, note:"軽井沢はカーリング競技の会場に。国際的な避暑地の名がさらに広まった。", hist:"gendai"},
+    {year:"2023", gaku:"令和5", title:"G7長野県軽井沢外務大臣会合", icon:I.medal, note:"4月、世界の外相が軽井沢に集う。避暑地が国際外交の舞台となった。", hist:"gendai"},
+  ]},
+];
+
+/* ---------------- FIGURES (people strip) ---------------- */
+const FIGURES = [
+  {initial:"S", name:"A.C.ショー", role:"避暑地の父・宣教師", color:"#2F6B45", hist:"shaw"},
+  {initial:"堀", name:"堀 辰雄", role:"『風立ちぬ』の作家", color:"#8A6A3F", hist:"villa"},
+  {initial:"内", name:"内村 鑑三", role:"思想家・石の教会", color:"#7A6FA6", spot:"stone"},
+  {initial:"L", name:"ジョン・レノン", role:"万平ホテルに滞在", color:"#B23B3B", spot:"mampei"},
+];
+
+/* ---------------- QUIZ ---------------- */
+const QUIZ = [
+  {era:"明治・避暑地",q:"軽井沢を避暑地として海外に紹介した、カナダ人宣教師は誰？",opts:["アントニン・レーモンド","A.C.ショー","内村鑑三","岡田時太郎"],ans:1,
+   exp:"A.C.ショーは1886年に軽井沢を訪れ、涼しい気候を「屋根のない病院」と評しました。避暑地・軽井沢の出発点です。"},
+  {era:"明治・避暑地",q:"ショーが軽井沢の気候を評して残したとされる言葉は？",opts:["東洋のスイス","屋根のない病院","高原の楽園","緑の別天地"],ans:1,
+   exp:"「屋根のない病院（Hospital without a roof）」。避暑によって健康を養う理想の地、という意味で語られました。"},
+  {era:"江戸時代",q:"避暑地となる前、軽井沢は何街道の宿場町として栄えた？",opts:["東海道","甲州街道","中山道","北陸道"],ans:2,
+   exp:"江戸と京都を結ぶ中山道の宿場町でした。軽井沢宿・沓掛宿・追分宿は「浅間三宿」と呼ばれます。"},
+  {era:"江戸時代",q:"1783年（天明3年）の浅間山大噴火が生んだ、溶岩の奇観は？",opts:["白糸の滝","雲場池","鬼押出し","塩沢湖"],ans:2,
+   exp:"流れ出た溶岩が固まってできたのが「鬼押出し」。現在は鬼押出し園として火山の迫力を体感できます。"},
+  {era:"建築・ホテル",q:"「軽井沢の鹿鳴館」と呼ばれた歴史的ホテルは？",opts:["万平ホテル","旧三笠ホテル","星野ホテル","プリンスホテル"],ans:1,
+   exp:"1906年開業の旧三笠ホテル。渋沢栄一ら著名人が多く宿泊し、この愛称で呼ばれました。国の重要文化財です。"},
+  {era:"建築・ホテル",q:"旧三笠ホテルを設計したのは誰？",opts:["外国人建築家","日本人建築家 岡田時太郎","宣教師ショー","堀辰雄"],ans:1,
+   exp:"日本人建築家・岡田時太郎による純西洋風木造建築です。外国人ではなく日本人が西洋建築を手がけた点が特徴です。"},
+  {era:"建築・ホテル",q:"万平ホテルのルーツとされる、江戸時代創業の施設は？",opts:["茶屋「一茶庵」","旅籠「亀屋」","宿坊「熊野堂」","酒蔵「浅間屋」"],ans:1,
+   exp:"1764年頃創業の旅籠「亀屋」がルーツ。明治期に外国人避暑客向けのホテルへと発展しました。"},
+  {era:"教会・建築",q:"三角屋根で知られる聖パウロカトリック教会を設計した建築家は？",opts:["ケンドリック・ケロッグ","アントニン・レーモンド","フランク・ロイド・ライト","岡田時太郎"],ans:1,
+   exp:"1935年、アントニン・レーモンドの設計。急勾配の三角屋根は軽井沢の象徴のひとつで、堀辰雄らの作品にも登場します。"},
+  {era:"人物・文学",q:"軽井沢を舞台にした小説『風立ちぬ』の作者は？",opts:["川端康成","室生犀星","堀辰雄","正宗白鳥"],ans:2,
+   exp:"堀辰雄です。軽井沢を深く愛し、『風立ちぬ』『美しい村』などにこの地の風景を描きました。"},
+  {era:"人物・文化",q:"1976年頃から毎夏、家族で万平ホテルなどに滞在した音楽家は？",opts:["ボブ・ディラン","ジョン・レノン","ポール・マッカートニー","エリック・クラプトン"],ans:1,
+   exp:"ジョン・レノンとオノ・ヨーコ一家。名物ロイヤルミルクティーは、レノンの注文がきっかけとされます。"},
+  {era:"思想・建築",q:"中軽井沢の「石の教会」が記念している思想家は？",opts:["新渡戸稲造","内村鑑三","福沢諭吉","西田幾多郎"],ans:1,
+   exp:"「無教会主義」を唱えた内村鑑三を記念する礼拝堂。石とガラスのオーガニック建築で知られます。"},
+  {era:"自然",q:"「白糸の滝」の水の源になっているものは？",opts:["浅間山の伏流水（地下水）","千曲川の分流","人工のダム","湯川の源流"],ans:0,
+   exp:"人工の水源ではなく、浅間山の伏流水（地下水）。だから水量が安定し、夏でもひんやりしています。"},
+  {era:"自然",q:"「スワンレイク」の通称でも親しまれる紅葉の名所は？",opts:["塩沢湖","雲場池","白糸の滝","碓氷湖"],ans:1,
+   exp:"雲場池です。水面に映る紅葉が美しく、風のない朝は特に絶景。多くの写真愛好家が訪れます。"},
+  {era:"交通・現代",q:"軽井沢が通年型リゾートへ変わる契機となった、1997年の出来事は？",opts:["高速道路の開通","長野（北陸）新幹線の開業","空港の開設","アプト式鉄道の開通"],ans:1,
+   exp:"1997年の長野（北陸）新幹線開業で東京から約1時間に。避暑地から通年型リゾートへと変化しました。"},
+  {era:"街道・江戸",q:"中山道と北国街道が分かれる分岐点として栄えた、浅間三宿のひとつは？",opts:["軽井沢宿","沓掛宿","追分宿","坂本宿"],ans:2,
+   exp:"追分宿です。中山道と北国街道の分岐（分去れ）にあたり、旅人や物資が集まる大きな宿場でした。"},
+  {era:"現代・国際",q:"2023年4月、軽井沢で開催されたG7の会合は？",opts:["首脳会議（サミット）","外務大臣会合","財務大臣会合","環境大臣会合"],ans:1,
+   exp:"2023年4月、G7長野県軽井沢外務大臣会合が開かれ、世界の外相が軽井沢に集いました。"},
+];
+
+/* ---------------- GAME: 中山道の旅（すごろく） ---------------- */
+const TRIP = [
+  {place:"追分宿", era:"江戸・中山道", icon:I.torii, color:"#8A6A3F",
+   fact:"旅の出発は追分宿。中山道と北国街道が分かれる分岐点「分去れ」で、旅人や物資が集まる大きな宿場でした。",
+   q:"追分宿で中山道から分かれる、もう一つの街道は？", opts:["東海道","北国街道","甲州街道"], ans:1,
+   done:"分去れの道標を横目に、いよいよ東の峠へ向けて出発！"},
+  {place:"沓掛宿", era:"江戸・中山道", icon:I.sign, color:"#8A6A3F",
+   fact:"次の宿場は沓掛宿。碓氷峠を控えた休息の地で、旅人はここで峠越えに備えました。",
+   q:"沓掛宿は、現在のどのエリアにあたる？", opts:["旧軽井沢","中軽井沢","南軽井沢"], ans:1,
+   done:"わらじを締め直し、峠のふもとの軽井沢宿へ。"},
+  {place:"軽井沢宿・碓氷峠", era:"江戸・中山道", icon:I.mtn, color:"#2F6B45",
+   fact:"軽井沢宿を過ぎると、中山道最大級の難所・碓氷峠。県境をまたいで鎮座する熊野神社が、旅の安全を見守りました。",
+   q:"中山道でも屈指の難所とされた峠は？", opts:["碓氷峠","野麦峠","和田峠"], ans:0,
+   done:"峠を越え、時は流れて明治の世へ——。"},
+  {place:"避暑地の発見（1886）", era:"明治・避暑地", icon:I.walk, color:"#2F6B45",
+   fact:"宿場の時代が終わるころ、宣教師ショーが軽井沢を訪れます。涼しい気候を「屋根のない病院」と評し、避暑地の歴史が始まりました。",
+   q:"軽井沢を避暑地として広めた宣教師は？", opts:["レーモンド","A.C.ショー","内村鑑三"], ans:1,
+   done:"別荘と教会が建ち、軽井沢はハイカラな避暑地へ。"},
+  {place:"クラシックホテルの時代", era:"明治・文化", icon:I.bldg, color:"#8A6A3F",
+   fact:"避暑客をもてなす西洋式ホテルが誕生。1906年開業の旧三笠ホテルは、著名人が集い「軽井沢の鹿鳴館」と呼ばれました。",
+   q:"「軽井沢の鹿鳴館」と呼ばれたホテルは？", opts:["万平ホテル","旧三笠ホテル","星野ホテル"], ans:1,
+   done:"文人や政財界人が集う、社交の高原リゾートに。"},
+  {place:"現代の軽井沢", era:"平成・令和", icon:I.train, color:"#B23B3B",
+   fact:"1997年の新幹線開業で通年リゾートへ。2023年にはG7外務大臣会合の舞台となり、軽井沢は世界に開かれました。",
+   q:"2023年4月、軽井沢で開かれたG7の会合は？", opts:["首脳会議","外務大臣会合","財務大臣会合"], ans:1,
+   done:"追分宿から現代まで——軽井沢の道のり、ここに完結！"},
+];
+
+/* ---------------- COURSES (tourism) ---------------- */
+const COURSES = [
+  {id:"history",title:"避暑地のはじまりを歩く 歴史さんぽ",badge:"歴史",duration:"約3時間",distance:"約4km",transport:"徒歩",
+   summary:"ショー宣教師ゆかりの地から、教会・クラシックホテルへ。軽井沢が避暑地になった物語をたどる旧軽コース。",
+   stops:[["shaw","軽井沢ショー記念礼拝堂","避暑地・軽井沢発祥の地から出発。ショーハウス記念館で当時の別荘暮らしに触れる。"],
+     ["ginza","旧軽井沢銀座通り","文化人が愛した老舗が並ぶメインストリートを食べ歩き。"],
+     ["stpaul","聖パウロカトリック教会","レーモンド設計、三角屋根の名建築を見学。"],
+     ["mampei","万平ホテル","旅籠「亀屋」を源流とするクラシックホテルへ。カフェでロイヤルミルクティーを。"]]},
+  {id:"kyukaru",title:"旧軽井沢 半日さんぽ",badge:"定番",duration:"約2〜3時間",distance:"約3km",transport:"徒歩",
+   summary:"雲場池から旧軽銀座、教会めぐりまで。はじめての軽井沢にちょうどいい王道コース。",
+   stops:[["kumoba","雲場池","水鏡の絶景から。一周20分の遊歩道を散策。"],
+     ["ginza","旧軽井沢銀座通り","ジャム・ソーセージ・ジェラートで食べ歩き。"],
+     ["stpaul","聖パウロカトリック教会","銀座裏手の静かな教会へ。"],
+     ["mampei","万平ホテル","締めはクラシックホテルのカフェテラスで。"]]},
+  {id:"nature",title:"自然満喫 1日ドライブ",badge:"自然",duration:"約6〜7時間",distance:"約40km",transport:"車・レンタカー",
+   summary:"雲場池から白糸の滝、鬼押出しへ。浅間山の雄大な自然を一日でめぐる。",
+   stops:[["kumoba","雲場池","朝いちばんの静かな水面を散策。"],
+     ["harunire","ハルニレテラス","星野エリアで川沿いのカフェ休憩。"],
+     ["shiraito","白糸の滝","浅間山の伏流水が糸のように流れる名瀑で涼を。"],
+     ["onioshi","鬼押出し園","天明の大噴火が生んだ溶岩原で火山の迫力を体感。"]]},
+  {id:"church",title:"教会と別荘建築めぐり",badge:"建築",duration:"約4時間",distance:"約10km",transport:"車＋徒歩",
+   summary:"個性豊かな教会と歴史的な別荘建築を巡る、大人の建築散歩。",
+   stops:[["shaw","軽井沢ショー記念礼拝堂","軽井沢最古の教会から。"],
+     ["stpaul","聖パウロカトリック教会","レーモンドの三角屋根建築。"],
+     ["stone","石の教会 内村鑑三記念堂","石とガラスのオーガニック建築。"],
+     ["taliesin","軽井沢タリアセン","塩沢湖畔で睡鳩荘など移築別荘を見学。"]]},
+  {id:"kaido",title:"中山道の旧道さんぽ 追分〜碓氷峠",badge:"街道",duration:"約1日",distance:"—",transport:"車＋徒歩",
+   summary:"浅間三宿から難所・碓氷峠まで、旧中山道の面影をたどる街道コース。",
+   stops:[["","追分宿（信濃追分）","中山道と北国街道の分岐「分去れ」。本陣跡や旧旅籠、追分節の里をめぐる。"],
+     ["","沓掛宿（中軽井沢）","峠を控えた休息の宿場。現在の中軽井沢エリアにあたる。"],
+     ["ginza","軽井沢宿（旧軽井沢銀座）","かつての軽井沢宿の街道筋。今はメインストリートとして賑わう。"],
+     ["usui","碓氷峠・見晴台","中山道最大級の難所。県境をまたぐ熊野神社と大パノラマ。"]]},
+];
+const courseById = id => COURSES.find(c=>c.id===id);
+
+/* ---------------- 中山道 宿場（地図オーバーレイ） ---------------- */
+const KAIDO = [
+  {name:"追分宿", lat:36.3360, lon:138.5730, note:"中山道と北国街道の分岐点「分去れ」。飯盛旅籠が並ぶ大きな宿場だった。"},
+  {name:"沓掛宿", lat:36.3450, lon:138.5960, note:"現在の中軽井沢。碓氷峠を控えた休息の宿場。"},
+  {name:"軽井沢宿", lat:36.3557, lon:138.6350, note:"現在の旧軽井沢。峠越え直前の宿場で、旧軽銀座はその街道筋にあたる。"},
+  {name:"碓氷峠", lat:36.3620, lon:138.6540, note:"中山道最大級の難所。県境をまたぐ熊野神社が旅の安全を見守った。"},
+];
+
+/* ---------------- STATE ---------------- */
+const LS = {
+  get(k,d){ try { const v=localStorage.getItem(k); return v==null?d:JSON.parse(v);} catch(e){ return (window.__m&&window.__m[k])??d; } },
+  set(k,v){ try { localStorage.setItem(k,JSON.stringify(v)); } catch(e){ (window.__m=window.__m||{})[k]=v; } },
+};
+let favs = new Set(LS.get("krz_favs",[]));
+function toggleFav(id){ favs.has(id)?favs.delete(id):favs.add(id); LS.set("krz_favs",[...favs]); }
+
+let currentTab = "home";
+let spotFilter = null, spotQuery = "", spotMapMode = true;
+let sightSub = "spots";   // "spots" | "courses"
+
+let quiz = { phase:"intro", order:[], idx:0, score:0, answered:false, picked:-1 };
+function bestScore(){ return LS.get("krz_best", null); }
+let gameSub = "trip";  // "trip" | "quiz"
+let trip = { phase:"intro", idx:0, correct:0, answered:false, picked:-1 };
+function tripBest(){ return LS.get("krz_tripbest", null); }
+
+const el = id => document.getElementById(id);
+const esc = s => (s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const ic = (svg,color,size=16)=>`<span style="width:${size}px;height:${size}px;display:inline-flex;color:${color||'currentColor'}">${svg}</span>`;
+const icS = svg => `<span style="width:12px;height:12px;display:inline-flex">${svg}</span>`;
+function catBadge(cat){ const c=CAT[cat]; return `<span class="tagpill" style="background:${c.color}22;color:${c.color}">${ic(c.icon,c.color,14)}${c.label}</span>`; }
+function spotGrad(cat){ const c=CAT[cat].color; return `background:linear-gradient(135deg, ${c}, ${c}99)`; }
+
+/* ---------------- TABS ---------------- */
+const TABS = [
+  {id:"home",label:"ホーム",icon:I.home},
+  {id:"timeline",label:"年表",icon:I.time},
+  {id:"stories",label:"読み物",icon:I.book},
+  {id:"quiz",label:"ゲーム",icon:I.game},
+  {id:"spots",label:"観光",icon:I.pin},
+];
+function renderTabs(){
+  el("tabbar").innerHTML = TABS.map(t=>`<button class="tab ${t.id===currentTab?'active':''}" data-tab="${t.id}">${t.icon}<span>${t.label}</span></button>`).join("");
+}
+
+/* ---------------- RENDER ---------------- */
+function render(){
+  const v = el("view"); v.scrollTop = 0;
+  el("statusbar").classList.toggle("on-hero", currentTab==="home");
+  ({home:viewHome,timeline:viewTimeline,stories:viewStories,quiz:viewQuiz,spots:viewSpots}[currentTab])();
+  v.firstElementChild && v.firstElementChild.classList.add("fade");
+  renderTabs();
+  if(currentTab==="spots" && spotMapMode) placePins();
+}
+function setView(html){ el("view").innerHTML = html; }
+
+/* ---- HOME ---- */
+function viewHome(){
+  const feats = ["shaw","asama","hotels","villa"].map(historyById);
+  const featYears = {shaw:"1886",asama:"1783",hotels:"1894",villa:"1920s"};
+  const best = bestScore();
+  const shortcuts = [
+    {tab:"timeline",h:"年表でたどる",s:"1764〜現代",icon:I.time},
+    {tab:"stories",h:"歴史を読む",s:`${HISTORY.length}本の物語`,icon:I.book},
+    {tab:"quiz",h:"クイズに挑戦",s:`全${QUIZ.length}問`,icon:I.quiz},
+    {tab:"spots",h:"観光・地図",s:`${SPOTS.length}スポット`,icon:I.pin},
+  ];
+  setView(`
+  <div class="hero">
+    <div class="hero-sky">${heroSky()}</div>
+    <div class="hero-inner">
+      <span class="season-tag">${ic(I.sign,'#fff',13)} 中山道から現代まで</span>
+      <h2 class="mincho">宿場町から、<br>避暑地へ。</h2>
+      <p>浅間のふもと、中山道の宿場町が世界のリゾートへと歩んだ物語をたどります。</p>
+      <button class="hero-cta" data-goto="spots">${ic(I.map,'currentColor',15)} 街道地図を開く</button>
+    </div>
+  </div>
+  <div class="pad">
+    <div class="quiz-teaser" style="background:linear-gradient(135deg,var(--sepia),var(--accent))" data-tab="quiz">
+      <span class="best">${ic(I.game,'currentColor',13)} ゲーム</span>
+      <h3 class="mincho">中山道の旅 &amp; 歴史クイズ</h3>
+      <p>宿場をたどる「中山道の旅」と全${QUIZ.length}問の4択クイズ。遊びながら軽井沢通に。</p>
+      <span class="go">${ic(I.play,'currentColor',13)} 遊ぶ</span>
+    </div>
+
+    <div class="eyebrow" style="margin-top:22px">Featured Stories</div>
+    <div class="section-title mincho" style="margin-bottom:2px">歴史を読む</div>
+  </div>
+  <div class="h-scroll">
+    ${feats.map(h=>`<button class="feat" data-hist="${h.id}">
+      <div class="thumb" style="background:linear-gradient(135deg,var(--accent),var(--sepia))">${ic(h.icon,'#fff',30)}<span class="yr">${featYears[h.id]||""}</span></div>
+      <div class="body"><h4>${esc(h.title.split(' — ')[0])}</h4><p>${esc(h.summary)}</p></div>
+    </button>`).join("")}
+  </div>
+
+  <div class="pad">
+    <div class="eyebrow" style="margin-top:22px">People</div>
+    <div class="section-title mincho" style="margin-bottom:12px">軽井沢を彩った人々</div>
+  </div>
+  <div class="figstrip">
+    ${FIGURES.map(f=>`<button class="figcard" style="border:none;background:none;cursor:pointer;font-family:inherit" ${f.hist?`data-hist="${f.hist}"`:`data-spot="${f.spot}"`}>
+      <span class="figavatar" style="background:linear-gradient(135deg,${f.color},${f.color}bb)">${f.initial}</span>
+      <b style="color:var(--ink)">${f.name}</b><span>${f.role}</span>
+    </button>`).join("")}
+  </div>
+
+  <div class="pad">
+    <div style="display:flex;align-items:baseline;justify-content:space-between;margin-top:22px">
+      <div><div class="eyebrow">Sightseeing</div><div class="section-title mincho">観光モデルコース</div></div>
+      <button class="chip" data-goto="courses" style="padding:6px 12px">すべて ${icS(I.chev)}</button>
+    </div>
+  </div>
+  <div class="h-scroll">
+    ${COURSES.slice(0,3).map(c=>`<button class="feat" data-course="${c.id}" style="width:196px">
+      <div class="thumb" style="background:linear-gradient(135deg,var(--sepia),var(--accent))">${ic(I.map,'#fff',30)}<span class="yr">${esc(c.badge)}コース</span></div>
+      <div class="body"><h4>${esc(c.title)}</h4><p>${icS(I.time)} ${c.duration} ・ ${c.stops.length}スポット</p></div>
+    </button>`).join("")}
+  </div>
+
+  <div class="pad">
+    <div class="eyebrow" style="margin-top:22px">Explore</div>
+    <div class="section-title mincho" style="margin-bottom:12px">目的から選ぶ</div>
+    <div class="shortcut-grid">
+      ${shortcuts.map(s=>`<button class="shortcut" data-tab="${s.tab}">
+        <span class="caticon" style="background:var(--accent-soft);color:var(--accent)">${s.icon}</span>
+        <span><h4>${s.h}</h4><span>${s.s}</span></span></button>`).join("")}
+    </div>
+    <p style="font-size:10.5px;color:var(--ink-3);text-align:center;margin-top:24px;line-height:1.6">
+      掲載内容は一般に知られる史実・観光情報にもとづくサンプルです。<br>年号・史実は各種資料を参照していますが、詳細は一次資料でご確認ください。
+    </p>
+  </div>`);
+}
+function heroSky(){
+  return `<svg viewBox="0 0 390 240" preserveAspectRatio="xMidYMid slice" width="100%" height="100%">
+    <defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3E7E58"/><stop offset="1" stop-color="#274E39"/></linearGradient></defs>
+    <rect width="390" height="240" fill="url(#sky)"/>
+    <circle cx="312" cy="54" r="30" fill="#ffffff" opacity=".18"/>
+    <path d="M120 150 L175 62 L215 100 L250 150 Z" fill="#20402e" opacity=".7"/>
+    <path d="M175 62 L162 82 L192 82 Z" fill="#e9efe8" opacity=".85"/>
+    <path d="M0 190 L80 120 L120 150 L180 96 L240 150 L300 110 L390 175 L390 240 L0 240 Z" fill="#274e39" opacity=".55"/>
+    <path d="M0 210 L70 170 L140 200 L210 165 L280 200 L340 172 L390 205 L390 240 L0 240 Z" fill="#8A6A3F" opacity=".3"/>
+    <g opacity=".9">${[52,150,250,338].map((x,i)=>`<g transform="translate(${x},${206-i%2*8})"><path d="M0 0 L-11 26 L11 26 Z" fill="#1f3a2a"/><path d="M0 -10 L-9 14 L9 14 Z" fill="#274832"/></g>`).join("")}</g>
+  </svg>`;
+}
+
+/* ---- TIMELINE ---- */
+function viewTimeline(){
+  setView(`<div class="pad">
+    <div class="eyebrow" style="margin-top:8px">Timeline · 1764–現代</div>
+    <div class="section-title mincho">軽井沢の歩み</div>
+    <p class="muted" style="font-size:12.5px;margin:6px 0 6px;line-height:1.6">宿場町の時代から国際的避暑地まで、主な出来事を年代順に。カードをタップすると読み物へ。</p>
+    ${TIMELINE.map(g=>`
+      <div class="era-head"><span class="dot"></span><h3 class="mincho">${esc(g.group)}</h3><span class="rule"></span></div>
+      ${g.items.map((it,i)=>{
+        const last = i===g.items.length-1;
+        const target = it.hist?`data-hist="${it.hist}"`:(it.spot?`data-spot="${it.spot}"`:"");
+        const linkLabel = it.hist?"読み物を開く":(it.spot?"スポットを見る":"");
+        return `<div class="tItem">
+          <div class="tRail"><div class="tYear mincho">${esc(it.year)}</div>${it.gaku?`<div class="tGaku">${esc(it.gaku)}</div>`:``}<div class="tNode"></div>${last?'':'<div class="tLine"></div>'}</div>
+          <div class="tBody">
+            <div class="tCard" ${target}>
+              <h4>${ic(it.icon,'var(--sepia)',18)} ${esc(it.title)}</h4>
+              <p>${esc(it.note)}</p>
+              ${linkLabel?`<span class="lnk">${linkLabel} ${ic(I.chev,'currentColor',12)}</span>`:``}
+            </div>
+          </div>
+        </div>`;
+      }).join("")}
+    `).join("")}
+  </div>`);
+}
+
+/* ---- STORIES ---- */
+function viewStories(){
+  setView(`<div class="pad">
+    <div class="eyebrow" style="margin-top:8px">Stories</div>
+    <div class="section-title mincho">歴史・文化の読み物</div>
+    <p class="muted" style="font-size:12.5px;margin:6px 0 18px;line-height:1.6">テーマごとに軽井沢の歴史を読み解きます。</p>
+    ${HISTORY.map(h=>`<button class="list-row" data-hist="${h.id}">
+      <span class="caticon" style="background:var(--sepia-soft);color:var(--sepia)">${h.icon}</span>
+      <span style="flex:1;min-width:0">
+        <span style="font-size:10.5px;font-weight:700;color:var(--sepia)">${esc(h.era)}</span>
+        <h4 style="margin-top:1px">${esc(h.title.split(' — ')[0])}</h4>
+        <p>${esc(h.summary)}</p></span>
+      <span style="width:18px;color:var(--ink-3);align-self:center">${I.chev}</span></button>`).join("")}
+  </div>`);
+}
+
+/* ---- GAME (trip + quiz) ---- */
+function viewQuiz(){
+  if(gameSub==="trip"){
+    if(trip.phase==="intro") return tripIntro();
+    if(trip.phase==="play") return tripPlay();
+    return tripResult();
+  }
+  if(quiz.phase==="intro") return quizIntro();
+  if(quiz.phase==="play") return quizPlay();
+  return quizResult();
+}
+function gameSeg(){
+  return `<div class="seg">
+    <button class="seg-btn ${gameSub==='trip'?'on':''}" data-gsub="trip">${icS(I.torii)} 中山道の旅</button>
+    <button class="seg-btn ${gameSub==='quiz'?'on':''}" data-gsub="quiz">${icS(I.quiz)} 4択クイズ</button>
+  </div>`;
+}
+
+/* ---- 中山道の旅（すごろく） ---- */
+function tripIntro(){
+  const best = tripBest();
+  setView(`<div class="pad">
+    ${gameSeg()}
+    <div class="q-hero" style="padding-top:14px">
+      <div class="q-badge pop" style="background:linear-gradient(135deg,var(--sepia),var(--accent))">${ic(I.torii,'#fff',40)}</div>
+      <h2 class="mincho">中山道の旅</h2>
+      <p>追分宿から出発し、宿場・峠・避暑地をこえて<br>現代の軽井沢へ。全${TRIP.length}宿の道中クイズに挑戦！</p>
+    </div>
+    <div class="trip-path">
+      ${TRIP.map((s,i)=>`<div class="tp-node"><span class="tp-dot" style="background:${s.color}">${i+1}</span><span class="tp-name">${esc(s.place.split('（')[0])}</span></div>${i<TRIP.length-1?'<span class="tp-link"></span>':''}`).join("")}
+    </div>
+    <div class="stat-row">
+      <div class="stat"><b>${TRIP.length}</b><span>宿場</span></div>
+      <div class="stat"><b>${best!=null?best:"—"}</b><span>自己ベスト</span></div>
+    </div>
+    <button class="btn-big" id="gameStart">${ic(I.play,'#fff',18)} 旅に出る</button>
+    <p style="font-size:11px;color:var(--ink-3);text-align:center;margin-top:14px;line-height:1.6">各宿場で1問。正解を集めて「道中記」の称号を目指そう。</p>
+  </div>`);
+}
+function startTrip(){ trip = { phase:"play", idx:0, correct:0, answered:false, picked:-1 }; render(); }
+function tripPlay(){
+  const s = TRIP[trip.idx];
+  const pct = Math.round((trip.idx + (trip.answered?1:0))/TRIP.length*100);
+  const correct = trip.answered && trip.picked===s.ans;
+  const opts = s.opts.map((o,i)=>{
+    let cls="q-opt"; let mk=String.fromCharCode(65+i);
+    if(trip.answered){ if(i===s.ans){cls+=" correct";mk=I.check;} else if(i===trip.picked){cls+=" wrong";mk=I.x;} }
+    const mkHtml = trip.answered&&(i===s.ans||i===trip.picked)?ic(mk,'#fff',15):mk;
+    return `<button class="${cls}" data-gopt="${i}" ${trip.answered?"disabled":""}><span class="mk">${mkHtml}</span><span>${esc(o)}</span></button>`;
+  }).join("");
+  setView(`<div class="pad">
+    <div class="q-progress" style="margin-top:10px">
+      <span class="q-count">${trip.idx+1} / ${TRIP.length} 宿</span>
+      <div class="q-bar"><i style="width:${pct}%"></i></div>
+      <span class="q-count" style="color:var(--accent)">${ic(I.flag,'currentColor',13)} ${trip.correct}</span>
+    </div>
+    <div class="trip-stage">
+      <div class="ts-scene" style="background:linear-gradient(135deg,${s.color},${s.color}aa)">${ic(s.icon,'#fff',48)}<span class="ts-photo">イメージ（写真差し替え可）</span></div>
+      <span class="q-era" style="margin-top:14px">${esc(s.era)}</span>
+      <h3 class="mincho" style="font-size:20px;font-weight:700;margin-top:2px">${esc(s.place)}</h3>
+      <p style="font-size:13px;color:var(--ink-2);line-height:1.7;margin-top:8px">${esc(s.fact)}</p>
+    </div>
+    <div class="q-question mincho" style="font-size:18px;margin-top:18px">${esc(s.q)}</div>
+    <div class="q-opts">${opts}</div>
+    ${trip.answered?`
+      <div class="q-exp">
+        <div class="verdict" style="color:${correct?'var(--ok)':'var(--ng)'}">${ic(correct?I.check:I.x,'currentColor',18)} ${correct?"正解！":"残念…"}</div>
+        <p>${esc(s.done)}</p>
+      </div>
+      <button class="btn-big" id="gameNext" style="margin-top:16px">${trip.idx+1<TRIP.length?"次の宿場へ":"旅の終わりへ"} ${ic(I.chev,'#fff',16)}</button>
+    `:``}
+  </div>`);
+}
+function answerTrip(i){ if(trip.answered) return; trip.answered=true; trip.picked=i; if(i===TRIP[trip.idx].ans) trip.correct++; render(); }
+function nextTrip(){ if(trip.idx+1<TRIP.length){ trip.idx++; trip.answered=false; trip.picked=-1; render(); } else finishTrip(); }
+function finishTrip(){ trip.phase="result"; const prev=tripBest(); if(prev==null||trip.correct>prev) LS.set("krz_tripbest",trip.correct); render(); }
+function tripRank(pct){
+  if(pct>=100) return {t:"中山道の達人",c:"#A97C2E",m:"極"};
+  if(pct>=67)  return {t:"健脚の旅人",c:"#2F6B45",m:"健"};
+  if(pct>=34)  return {t:"街道の見習い",c:"#8A6A3F",m:"歩"};
+  return {t:"旅のはじまり",c:"#B23B3B",m:"初"};
+}
+function tripResult(){
+  const pct=Math.round(trip.correct/TRIP.length*100);
+  const r=tripRank(pct); const best=tripBest();
+  const isBest = trip.correct>=best && best!=null;
+  setView(`<div class="pad" style="text-align:center">
+    <div class="q-hero" style="padding-top:22px">
+      <div class="result-medal pop mincho" style="background:linear-gradient(135deg,${r.c},${r.c}bb)">${r.m}</div>
+      <div class="result-score mincho">${trip.correct}<span style="font-size:22px;color:var(--ink-3)"> / ${TRIP.length}</span></div>
+      <div class="result-rank mincho" style="color:${r.c}">${r.t}</div>
+      <div class="result-note">道中の正答率 ${pct}％${isBest?"　🎉 自己ベスト更新！":""}<br>追分宿から現代の軽井沢まで、旅は完結しました。</div>
+    </div>
+    <button class="btn-big" id="gameAgain" style="margin-top:22px">${ic(I.refresh,'#fff',18)} もう一度旅する</button>
+    <button class="btn-ghost" data-tab="timeline">年表で歴史を振り返る</button>
+  </div>`);
+}
+
+/* ---- QUIZ ---- */
+function quizIntro(){
+  const best = bestScore();
+  const played = LS.get("krz_played",0);
+  setView(`<div class="pad">
+    ${gameSeg()}
+    <div class="q-hero" style="padding-top:14px">
+      <div class="q-badge pop">${ic(I.quiz,'#fff',40)}</div>
+      <h2 class="mincho">軽井沢 歴史クイズ</h2>
+      <p>宿場町から避暑地まで、軽井沢の歴史を4択で。<br>全${QUIZ.length}問、回答ごとに解説つき。</p>
+    </div>
+    <div class="stat-row">
+      <div class="stat"><b>${QUIZ.length}</b><span>問 / 全</span></div>
+      <div class="stat"><b>${best!=null?best:"—"}</b><span>ベストスコア</span></div>
+      <div class="stat"><b>${played}</b><span>挑戦回数</span></div>
+    </div>
+    <button class="btn-big" id="quizStart">${ic(I.play,'#fff',18)} クイズをはじめる</button>
+    <p style="font-size:11px;color:var(--ink-3);text-align:center;margin-top:14px;line-height:1.6">称号は正答率で決まります。満点を目指して挑戦しよう。</p>
+  </div>`);
+}
+function shuffle(n){ // deterministic-ish shuffle without Math.random on load; use time seed
+  const a=[...Array(n).keys()];
+  let seed = (new Date().getTime())>>>0 || 12345;
+  for(let i=a.length-1;i>0;i--){ seed=(seed*1103515245+12345)&0x7fffffff; const j=seed%(i+1); [a[i],a[j]]=[a[j],a[i]]; }
+  return a;
+}
+function startQuiz(){
+  quiz = { phase:"play", order:shuffle(QUIZ.length), idx:0, score:0, answered:false, picked:-1 };
+  render();
+}
+function quizPlay(){
+  const total = quiz.order.length;
+  const item = QUIZ[quiz.order[quiz.idx]];
+  const pct = Math.round((quiz.idx + (quiz.answered?1:0))/total*100);
+  const opts = item.opts.map((o,i)=>{
+    let cls="q-opt"; let mk = String.fromCharCode(65+i);
+    if(quiz.answered){
+      if(i===item.ans){ cls+=" correct"; mk=I.check; }
+      else if(i===quiz.picked){ cls+=" wrong"; mk=I.x; }
+    }
+    const mkHtml = quiz.answered && (i===item.ans||i===quiz.picked) ? ic(mk,'#fff',15) : mk;
+    return `<button class="${cls}" data-opt="${i}" ${quiz.answered?"disabled":""}>
+      <span class="mk">${mkHtml}</span><span>${esc(o)}</span></button>`;
+  }).join("");
+  const correct = quiz.answered && quiz.picked===item.ans;
+  setView(`<div class="pad">
+    <div class="q-progress" style="margin-top:10px">
+      <span class="q-count">${quiz.idx+1} / ${total}</span>
+      <div class="q-bar"><i style="width:${pct}%"></i></div>
+      <span class="q-count" style="color:var(--accent)">${quiz.score}問正解</span>
+    </div>
+    <span class="q-era">${esc(item.era)}</span>
+    <div class="q-question mincho">${esc(item.q)}</div>
+    <div class="q-opts">${opts}</div>
+    ${quiz.answered?`
+      <div class="q-exp">
+        <div class="verdict" style="color:${correct?'var(--ok)':'var(--ng)'}">${ic(correct?I.check:I.x,'currentColor',18)} ${correct?"正解！":"不正解"}</div>
+        <p>${esc(item.exp)}</p>
+      </div>
+      <button class="btn-big" id="quizNext" style="margin-top:16px">${quiz.idx+1<total?"次の問題へ":"結果を見る"} ${ic(I.chev,'#fff',16)}</button>
+    `:``}
+  </div>`);
+}
+function answerQuiz(i){
+  if(quiz.answered) return;
+  quiz.answered=true; quiz.picked=i;
+  if(i===QUIZ[quiz.order[quiz.idx]].ans) quiz.score++;
+  render();
+}
+function nextQuiz(){
+  if(quiz.idx+1<quiz.order.length){ quiz.idx++; quiz.answered=false; quiz.picked=-1; render(); }
+  else { finishQuiz(); }
+}
+function finishQuiz(){
+  quiz.phase="result";
+  const prev = bestScore();
+  if(prev==null || quiz.score>prev) LS.set("krz_best", quiz.score);
+  LS.set("krz_played", LS.get("krz_played",0)+1);
+  render();
+}
+function rankFor(pct){
+  if(pct>=100) return {t:"軽井沢の生き字引",c:"#A97C2E",m:"極"};
+  if(pct>=80)  return {t:"別荘族マイスター",c:"#2F6B45",m:"優"};
+  if(pct>=60)  return {t:"避暑地の常連",c:"#7A6FA6",m:"良"};
+  if(pct>=40)  return {t:"旧軽さんぽ見習い",c:"#8A6A3F",m:"可"};
+  return {t:"これから軽井沢通",c:"#B23B3B",m:"挑"};
+}
+function quizResult(){
+  const total = quiz.order.length;
+  const pct = Math.round(quiz.score/total*100);
+  const r = rankFor(pct);
+  const best = bestScore();
+  const isBest = quiz.score>=best && best!=null;
+  setView(`<div class="pad" style="text-align:center">
+    <div class="q-hero" style="padding-top:24px">
+      <div class="result-medal pop mincho" style="background:linear-gradient(135deg,${r.c},${r.c}bb)">${r.m}</div>
+      <div class="result-score mincho">${quiz.score}<span style="font-size:22px;color:var(--ink-3)"> / ${total}</span></div>
+      <div class="result-rank mincho" style="color:${r.c}">${r.t}</div>
+      <div class="result-note">正答率 ${pct}％${isBest?"　🎉 自己ベスト更新！":""}</div>
+    </div>
+    <div class="stat-row" style="margin-top:22px">
+      <div class="stat"><b>${quiz.score}</b><span>正解</span></div>
+      <div class="stat"><b>${total-quiz.score}</b><span>不正解</span></div>
+      <div class="stat"><b>${best}</b><span>ベスト</span></div>
+    </div>
+    <button class="btn-big" id="quizAgain">${ic(I.refresh,'#fff',18)} もう一度挑戦</button>
+    <button class="btn-ghost" data-tab="timeline">年表で復習する</button>
+  </div>`);
+}
+
+/* ---- SIGHTSEEING (spots + courses) ---- */
+function viewSpots(){
+  const seg = `<div class="seg">
+    <button class="seg-btn ${sightSub==='spots'?'on':''}" data-sub="spots">${icS(I.pin)} スポット</button>
+    <button class="seg-btn ${sightSub==='courses'?'on':''}" data-sub="courses">${icS(I.map)} モデルコース</button>
+  </div>`;
+  if(sightSub==="courses"){
+    setView(`<div class="pad">
+      <div class="eyebrow" style="margin-top:8px">Sightseeing</div>
+      <div class="section-title mincho">観光</div>
+      ${seg}
+      <p class="muted" style="font-size:12.5px;margin:2px 0 14px;line-height:1.6">目的別のおすすめ周遊ルート。カードを開くと順路が見られます。</p>
+      ${COURSES.map(courseCard).join("")}
+    </div>`);
+    return;
+  }
+  const q = spotQuery.trim();
+  let list = SPOTS;
+  if(spotFilter) list = list.filter(s=>s.cat===spotFilter);
+  if(q) list = list.filter(s=>(s.name+s.reading+s.summary+s.area).includes(q));
+  const chips = [`<button class="chip ${!spotFilter?'active':''}" data-cat="">すべて</button>`]
+    .concat(Object.entries(CAT).map(([k,c])=>`<button class="chip ${spotFilter===k?'active':''}" data-cat="${k}">${icS(c.icon)} ${c.label}</button>`)).join("");
+  setView(`<div class="pad">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px">
+      <div><div class="eyebrow">Sightseeing</div><div class="section-title mincho">観光</div></div>
+      <button class="chip" id="mapToggle">${spotMapMode?icS(I.book)+' リスト':icS(I.map)+' 地図'}</button>
+    </div>
+    ${seg}
+    <div class="search" style="margin-top:4px">${I.search}<input id="spotSearch" placeholder="名前・エリアで検索…" value="${esc(spotQuery)}" /></div>
+    <div class="h-scroll" style="margin-bottom:16px;gap:8px">${chips}</div>
+    ${spotMapMode?spotMapHTML(list):(list.length?list.map(spotRow).join(""):`<div class="empty">該当するスポットがありません</div>`)}
+  </div>`);
+}
+function courseCard(c){
+  return `<div class="crs-card" data-course="${c.id}">
+    <div style="display:flex;align-items:center;gap:8px">
+      <span class="crs-badge">${esc(c.badge)}</span>
+      <span style="font-size:11px;color:var(--ink-3)">${c.stops.length}スポット</span>
+    </div>
+    <h3 class="mincho" style="font-size:17.5px;font-weight:700;margin-top:8px;line-height:1.4">${esc(c.title)}</h3>
+    <p style="font-size:12.5px;color:var(--ink-2);margin-top:6px;line-height:1.55">${esc(c.summary)}</p>
+    <div class="crs-metrics">
+      <span>${icS(I.time)} ${c.duration}</span>
+      <span>${icS(I.walk)} ${c.distance}</span>
+      <span>${icS(I.map)} ${c.transport}</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;margin-top:12px;color:var(--ink-3);font-size:11px">
+      <span style="display:flex">${c.stops.slice(0,5).map(()=>`<span style="width:9px;height:9px;border-radius:50%;background:var(--accent);border:2px solid var(--surface);margin-left:-3px"></span>`).join("")}</span>
+      順路を見る<span style="margin-left:auto;width:16px;color:var(--ink-3)">${I.chev}</span>
+    </div>
+  </div>`;
+}
+function spotRow(sp){
+  const on = favs.has(sp.id);
+  return `<button class="list-row" data-spot="${sp.id}">
+    <span class="caticon" style="background:${CAT[sp.cat].color}1e;color:${CAT[sp.cat].color}">${CAT[sp.cat].icon}</span>
+    <span style="flex:1;min-width:0"><h4>${sp.name}</h4><p>${esc(sp.summary)}</p>
+      <span class="list-meta">${icS(I.pin)} ${sp.area} ・ ${CAT[sp.cat].label}</span></span>
+    <span class="heart ${on?'on':''}" data-fav="${sp.id}" role="button" aria-label="お気に入り">${I.heart(on)}</span>
+  </button>`;
+}
+function spotMapHTML(list){
+  return `<div class="map-wrap tall" id="mapWrap">${terrainSVG()}<div id="pinLayer" style="position:absolute;inset:0"></div></div>
+    <div class="map-legend"><span><i class="lg-road"></i> 旧中山道</span><span><i class="lg-juku"></i> 宿場（宿）</span><span><i class="lg-spot"></i> スポット</span></div>
+    <p style="font-size:10.5px;color:var(--ink-3);margin-top:8px">※位置関係を示した模式図です。「宿」や丸いピンをタップすると詳細が開きます。</p>
+    <div style="margin-top:14px">${list.map(spotRow).join("")}</div>`;
+}
+const LAT_MIN=36.320,LAT_MAX=36.440,LON_MIN=138.528,LON_MAX=138.660;
+const projX=lon=>8+(lon-LON_MIN)/(LON_MAX-LON_MIN)*84;
+const projY=lat=>90-(lat-LAT_MIN)/(LAT_MAX-LAT_MIN)*80;
+function currentSpotList(){ const q=spotQuery.trim(); let l=SPOTS; if(spotFilter)l=l.filter(s=>s.cat===spotFilter); if(q)l=l.filter(s=>(s.name+s.reading+s.summary+s.area).includes(q)); return l; }
+function placePins(){
+  const layer=el("pinLayer"); if(!layer) return;
+  const juku = KAIDO.map((k,i)=>`<div class="pin juku" style="left:${projX(k.lon)}%;top:${projY(k.lat)}%" data-juku="${i}">
+      <div class="juku-dot">宿</div><div class="juku-lbl">${esc(k.name)}</div></div>`).join("");
+  const spots = currentSpotList().map(sp=>{
+    const x=projX(sp.lon),y=projY(sp.lat),c=CAT[sp.cat].color;
+    return `<div class="pin" style="left:${x}%;top:${y}%" data-spot="${sp.id}"><div class="pin-dot" style="background:${c}">${ic(CAT[sp.cat].icon,'#fff',15)}</div></div>`;
+  }).join("");
+  layer.innerHTML = juku + spots;
+}
+function kaidoRoute(){
+  return KAIDO.map((k,i)=>`${i?'L':'M'} ${projX(k.lon).toFixed(1)} ${projY(k.lat).toFixed(1)}`).join(" ");
+}
+function terrainSVG(){
+  return `<svg class="terrain" viewBox="0 0 100 96" preserveAspectRatio="none" style="background:linear-gradient(160deg,var(--surface),var(--sepia-soft))">
+    <path d="M20 2 L40 30 L8 30 Z" fill="var(--line-strong)" opacity=".6"/>
+    <path d="M28 6 L26 12 L33 12 Z" fill="var(--surface-2)"/>
+    <ellipse cx="70" cy="20" rx="26" ry="14" fill="var(--accent)" opacity=".12"/>
+    <ellipse cx="30" cy="70" rx="30" ry="18" fill="var(--accent)" opacity=".1"/>
+    <path d="M6 44 C30 40 50 60 96 52" stroke="#5b9dc4" stroke-width="1.4" fill="none" opacity=".45"/>
+    <path d="M50 92 L52 30" stroke="var(--line-strong)" stroke-width="1" fill="none" stroke-dasharray="2 2"/>
+    <path d="${kaidoRoute()}" stroke="var(--sepia)" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-dasharray="3 2" opacity=".95"/>
+    <text x="24" y="26" font-size="3" fill="var(--ink-3)" font-family="sans-serif">浅間山</text>
+    <text x="40" y="93" font-size="2.5" fill="var(--sepia)" font-family="sans-serif">旧中山道</text>
+  </svg>`;
+}
+function jukuSheet(k){
+  return `<div class="sheet-hero" style="background:linear-gradient(135deg,var(--sepia),#5b452c)"><span class="big">${ic(I.sign,'#fff',56)}</span><span class="era-tag">中山道の宿場</span></div>
+  <div class="sheet-pad">
+    <h2 class="mincho">${esc(k.name)}</h2>
+    <div class="tag-strip"><span class="tagpill" style="background:var(--sepia-soft);color:var(--sepia)">${icS(I.sign)} 浅間三宿・碓氷峠</span></div>
+    <p style="font-size:14px;line-height:1.85;margin-top:6px">${esc(k.note)}</p>
+    <div style="margin-top:16px;font-size:12px;color:var(--ink-3);display:flex;align-items:center;gap:6px">${icS(I.pin)} 北緯 ${k.lat.toFixed(4)}° / 東経 ${k.lon.toFixed(4)}°</div>
+    <div class="info-card"><span style="color:var(--sepia)">${I.book}</span><div><h5>もっと知る</h5><p>「中山道と碓氷峠」の読み物で、街道と宿場の歴史を紹介しています。</p></div></div>
+    <button class="btn-primary" data-hist="kaido">${icS(I.book)} 中山道の読み物へ</button>
+  </div>`;
+}
+
+/* ---------------- SHEETS ---------------- */
+function openSheet(html){ el("sheetScroll").innerHTML=html; el("sheetScroll").scrollTop=0; el("scrim").classList.add("open"); el("sheet").classList.add("open"); }
+function closeSheet(){ el("scrim").classList.remove("open"); el("sheet").classList.remove("open"); }
+function sceneSVG(cat){
+  const c = CAT[cat].color;
+  return `<svg viewBox="0 0 100 60" preserveAspectRatio="xMidYMid slice" width="100%" height="100%" style="position:absolute;inset:0">
+    <defs><linearGradient id="sc" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${c}"/><stop offset="1" stop-color="${c}bb"/></linearGradient></defs>
+    <rect width="100" height="60" fill="url(#sc)"/>
+    <circle cx="80" cy="14" r="8" fill="#fff" opacity=".18"/>
+    <path d="M0 44 L26 24 L40 36 L58 20 L76 38 L100 22 L100 60 L0 60 Z" fill="#ffffff" opacity=".14"/>
+    <path d="M0 52 L22 40 L44 52 L66 40 L88 52 L100 46 L100 60 L0 60 Z" fill="#000000" opacity=".12"/>
+    ${[14,40,66,88].map((x,i)=>`<g transform="translate(${x},${52-i%2*4})" opacity=".5"><path d="M0 0 L-4 9 L4 9 Z" fill="#0a2417"/><path d="M0 -3 L-3 5 L3 5 Z" fill="#123020"/></g>`).join("")}
+  </svg>`;
+}
+function sheetSpot(sp){
+  const on=favs.has(sp.id);
+  return `<div class="sheet-hero" style="${spotGrad(sp.cat)}">
+      ${sceneSVG(sp.cat)}
+      <span class="big" style="position:relative">${ic(CAT[sp.cat].icon,'#fff',62)}</span>
+      <span class="ts-photo" style="position:absolute;bottom:12px;right:14px">イメージ（実写真に差し替え可）</span>
+    </div>
+  <div class="sheet-pad">
+    <div class="reading">${esc(sp.reading)}</div>
+    <div style="display:flex;align-items:flex-start;gap:10px"><h2 class="mincho" style="flex:1">${sp.name}</h2>
+      <button class="heart ${on?'on':''}" data-fav="${sp.id}" style="margin-top:4px">${I.heart(on)}</button></div>
+    <div class="tag-strip">${catBadge(sp.cat)}<span class="tagpill" style="background:var(--sepia-soft);color:var(--sepia)">${icS(I.pin)} ${sp.area}</span></div>
+    <p style="font-size:14px;line-height:1.85;margin-top:6px">${esc(sp.desc)}</p>
+    <div class="info-card"><span style="color:var(--accent)">${I.leaf}</span><div><h5>おすすめの季節</h5><p>${esc(sp.season)}</p></div></div>
+    <div class="info-card"><span style="color:var(--gold)">${I.bulb}</span><div><h5>豆知識</h5><p>${esc(sp.tips)}</p></div></div>
+    <div style="margin-top:16px;font-size:12px;color:var(--ink-3);display:flex;align-items:center;gap:6px">${icS(I.pin)} 北緯 ${sp.lat.toFixed(4)}° / 東経 ${sp.lon.toFixed(4)}°</div>
+    <a class="btn-primary" href="https://maps.apple.com/?q=${encodeURIComponent(sp.name)}&ll=${sp.lat},${sp.lon}" target="_blank" rel="noopener">${icS(I.ext)} マップで開く</a>
+  </div>`;
+}
+function sheetHistory(h){
+  const rel=(h.related||[]).map(spotById).filter(Boolean);
+  return `<div class="sheet-hero" style="background:linear-gradient(135deg,var(--accent),var(--sepia))"><span class="big">${ic(h.icon,'#fff',58)}</span><span class="era-tag">${esc(h.era)}</span></div>
+  <div class="sheet-pad">
+    <h2 class="mincho">${esc(h.title)}</h2>
+    <p style="font-size:14px;color:var(--ink-2);margin-top:8px;line-height:1.6">${esc(h.summary)}</p>
+    <div class="body-text">${h.body.map(p=>`<p>${esc(p)}</p>`).join("")}</div>
+    ${rel.length?`<div class="divider"></div><h4 style="font-size:14px;font-weight:700;margin-top:14px">関連スポット</h4>
+      ${rel.map(sp=>`<button class="related" data-spot="${sp.id}">
+        <span class="caticon" style="width:34px;height:34px;background:${CAT[sp.cat].color}1e;color:${CAT[sp.cat].color}">${CAT[sp.cat].icon}</span>
+        <span style="flex:1"><b style="font-size:13.5px">${sp.name}</b><br><span style="font-size:11px;color:var(--ink-3)">${sp.area}</span></span>
+        <span style="width:16px;color:var(--ink-3)">${I.chev}</span></button>`).join("")}`:``}
+  </div>`;
+}
+
+function sheetCourse(c){
+  return `<div class="sheet-hero" style="background:linear-gradient(135deg,var(--accent),var(--sepia))"><span class="big">${ic(I.map,'#fff',54)}</span><span class="era-tag">${esc(c.badge)}コース</span></div>
+  <div class="sheet-pad">
+    <h2 class="mincho">${esc(c.title)}</h2>
+    <p style="font-size:13.5px;color:var(--ink-2);margin-top:8px;line-height:1.6">${esc(c.summary)}</p>
+    <div class="tag-strip" style="margin-top:14px">
+      <span class="tagpill" style="background:var(--accent-soft);color:var(--accent-ink)">${icS(I.time)} ${c.duration}</span>
+      <span class="tagpill" style="background:var(--accent-soft);color:var(--accent-ink)">${icS(I.walk)} ${c.distance}</span>
+      <span class="tagpill" style="background:var(--accent-soft);color:var(--accent-ink)">${icS(I.map)} ${c.transport}</span>
+    </div>
+    <div class="divider"></div>
+    <h4 style="font-size:14px;font-weight:700;margin:14px 0 16px">順路</h4>
+    ${c.stops.map((st,i)=>{
+      const sp = st[0]?spotById(st[0]):null;
+      const last = i===c.stops.length-1;
+      return `<div style="display:flex;gap:14px">
+        <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0">
+          <div style="width:30px;height:30px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-size:13px;font-weight:700">${i+1}</div>
+          ${last?'':'<div style="width:2px;flex:1;background:color-mix(in srgb,var(--accent) 40%,transparent);min-height:22px"></div>'}
+        </div>
+        <div style="padding-bottom:18px">
+          ${sp?`<button class="related" data-spot="${sp.id}" style="padding:0;background:none;border:none;margin:0"><h4 style="font-size:15px;font-weight:700;display:inline-flex;align-items:center;gap:4px">${esc(st[1])} <span style="width:13px;color:var(--ink-3)">${I.chev}</span></h4></button>`:`<h4 style="font-size:15px;font-weight:700">${esc(st[1])}</h4>`}
+          <p style="font-size:12.5px;color:var(--ink-2);margin-top:4px;line-height:1.5">${esc(st[2])}</p>
+        </div>
+      </div>`;
+    }).join("")}
+  </div>`;
+}
+
+/* ---------------- EVENTS ---------------- */
+document.addEventListener("click", e=>{
+  const t=e.target.closest("[data-tab],[data-goto],[data-spot],[data-hist],[data-course],[data-juku],[data-sub],[data-gsub],[data-cat],[data-fav],[data-opt],[data-gopt],#mapToggle,#quizStart,#quizNext,#quizAgain,#gameStart,#gameNext,#gameAgain");
+  if(!t) return;
+  if(t.hasAttribute("data-goto")){ sightSub=t.getAttribute("data-goto"); currentTab="spots"; closeSheet(); render(); return; }
+  if(t.hasAttribute("data-juku")){ openSheet(jukuSheet(KAIDO[+t.getAttribute("data-juku")])); return; }
+  if(t.hasAttribute("data-fav")){ e.stopPropagation(); const id=t.getAttribute("data-fav"); toggleFav(id);
+    if(el("sheet").classList.contains("open")){ t.classList.toggle("on",favs.has(id)); t.innerHTML=I.heart(favs.has(id)); }
+    if(currentTab==="spots") render(); return; }
+  if(t.id==="mapToggle"){ spotMapMode=!spotMapMode; render(); return; }
+  if(t.hasAttribute("data-sub")){ sightSub=t.getAttribute("data-sub"); render(); return; }
+  if(t.hasAttribute("data-course")){ openSheet(sheetCourse(courseById(t.getAttribute("data-course")))); return; }
+  if(t.id==="quizStart"||t.id==="quizAgain"){ startQuiz(); return; }
+  if(t.id==="quizNext"){ nextQuiz(); return; }
+  if(t.hasAttribute("data-opt")){ answerQuiz(+t.getAttribute("data-opt")); return; }
+  if(t.hasAttribute("data-gsub")){ gameSub=t.getAttribute("data-gsub"); trip.phase="intro"; quiz.phase="intro"; render(); return; }
+  if(t.id==="gameStart"){ startTrip(); return; }
+  if(t.id==="gameNext"){ nextTrip(); return; }
+  if(t.id==="gameAgain"){ startTrip(); return; }
+  if(t.hasAttribute("data-gopt")){ answerTrip(+t.getAttribute("data-gopt")); return; }
+  if(t.hasAttribute("data-tab")){ const tab=t.getAttribute("data-tab"); if(tab==="quiz"&&currentTab!=="quiz"){ quiz.phase="intro"; trip.phase="intro"; } currentTab=tab; closeSheet(); render(); return; }
+  if(t.hasAttribute("data-cat")){ spotFilter=t.getAttribute("data-cat")||null; render(); return; }
+  if(t.hasAttribute("data-spot")){ openSheet(sheetSpot(spotById(t.getAttribute("data-spot")))); return; }
+  if(t.hasAttribute("data-hist")){ openSheet(sheetHistory(historyById(t.getAttribute("data-hist")))); return; }
+});
+document.addEventListener("input", e=>{
+  if(e.target.id==="spotSearch"){ spotQuery=e.target.value; const pos=e.target.selectionStart; render();
+    const i=el("spotSearch"); if(i){ i.focus(); i.setSelectionRange(pos,pos); } }
+});
+el("sheetClose").addEventListener("click", closeSheet);
+el("scrim").addEventListener("click", closeSheet);
+el("themeBtn").addEventListener("click", ()=>{
+  const root=document.documentElement, cur=root.getAttribute("data-theme");
+  const sysDark=window.matchMedia("(prefers-color-scheme: dark)").matches;
+  const now=cur?cur:(sysDark?"dark":"light");
+  root.setAttribute("data-theme", now==="dark"?"light":"dark");
+});
+function tick(){ const d=new Date(); el("clock").textContent=d.getHours()+":"+String(d.getMinutes()).padStart(2,"0"); }
+tick(); setInterval(tick,20000);
+renderTabs(); render();
+</script>

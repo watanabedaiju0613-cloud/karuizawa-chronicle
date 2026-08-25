@@ -1,0 +1,12 @@
+{
+  "name": "karuizawa-chronicle",
+  "version": "1.0.0",
+  "description": "軽井沢クロニクル — 中山道から現代までの軽井沢の歴史アプリ",
+  "devDependencies": {
+    "@capacitor/cli": "^6.1.0"
+  },
+  "dependencies": {
+    "@capacitor/core": "^6.1.0",
+    "@capacitor/ios": "^6.1.0"
+  }
+}
