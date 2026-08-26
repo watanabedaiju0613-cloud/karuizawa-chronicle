@@ -1,6 +1,28 @@
 <title>軽井沢クロニクル</title>
+<meta name="color-scheme" content="light dark" />
+<script>
+(function(){
+  function show(msg){
+    try{
+      var d=document.getElementById('__bootErr');
+      if(!d){ d=document.createElement('div'); d.id='__bootErr';
+        d.setAttribute('style','position:fixed;left:0;right:0;top:0;z-index:99999;background:#fff;color:#8a1f1f;font:13px/1.7 -apple-system,system-ui,sans-serif;padding:16px;white-space:pre-wrap;word-break:break-word;border-bottom:4px solid #8a1f1f');
+        (document.body||document.documentElement).appendChild(d); }
+      d.textContent = '起動エラー\n' + msg;
+    }catch(e){}
+  }
+  window.addEventListener('error', function(e){
+    show((e.message||'error') + '\n' + (e.filename||'') + ' : ' + (e.lineno||'') + ':' + (e.colno||''));
+  });
+  window.addEventListener('unhandledrejection', function(e){
+    var r = e.reason; show('promise: ' + (r && r.message ? r.message : String(r)));
+  });
+})();
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <style>
+  html { background: #F0EDE4; }
+  @media (prefers-color-scheme: dark) { html:not([data-theme="light"]) { background: #100D09; } }
   :root {
     --bg: #E4E1D8;
     --app-bg: #F0EDE4;
@@ -22,9 +44,13 @@
     --shadow: 30px 60px 120px rgba(40,32,20,.30), 0 8px 30px rgba(40,32,20,.14);
     --ok: #2F8C57;
     --ng: #C0472F;
+    --ok-bg: #E8F3EC;
+    --ng-bg: #F8E7E2;
+    --accent-line: #A8C6B3;
+    --tabbar-bg: #FAF8F1;
   }
-  :root:not([data-theme="light"]) {
-    @media (prefers-color-scheme: dark) {
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
       --bg: #100D09;
       --app-bg: #17130D;
       --surface: #201B14;
@@ -46,6 +72,10 @@
       --shadow: 30px 60px 120px rgba(0,0,0,.6), 0 8px 30px rgba(0,0,0,.45);
       --ok: #5CB37E;
       --ng: #E0836E;
+      --ok-bg: #1E2A22;
+      --ng-bg: #2E1F1B;
+      --accent-line: #3A5544;
+      --tabbar-bg: #201B14;
     }
   }
   :root[data-theme="dark"] {
@@ -55,12 +85,13 @@
     --sepia: #C6A778; --sepia-soft: #2C2418; --gold: #D6AC63; --crimson: #D9776B;
     --frame: #050403; --shadow: 30px 60px 120px rgba(0,0,0,.6), 0 8px 30px rgba(0,0,0,.45);
     --ok: #5CB37E; --ng: #E0836E;
+    --ok-bg: #1E2A22; --ng-bg: #2E1F1B; --accent-line: #3A5544; --tabbar-bg: #201B14;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
     font-family: "Zen Kaku Gothic New", -apple-system, system-ui, sans-serif;
-    background: radial-gradient(1200px 700px at 50% -12%, color-mix(in srgb, var(--sepia) 14%, var(--bg)), transparent 60%), var(--bg);
+    background: radial-gradient(1200px 700px at 50% -12%, rgba(138,106,63,.14), transparent 60%), var(--bg);
     color: var(--ink); min-height: 100vh;
     display: flex; flex-direction: column; align-items: center; gap: 20px;
     padding: 32px 16px 56px; -webkit-font-smoothing: antialiased;
@@ -88,7 +119,7 @@
   .view::-webkit-scrollbar { display: none; }
   .pad { padding: 4px 18px 26px; }
 
-  .tabbar { flex-shrink: 0; height: 78px; display: flex; background: color-mix(in srgb, var(--surface) 88%, transparent); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border-top: 1px solid var(--line); padding-bottom: 14px; z-index: 30; }
+  .tabbar { flex-shrink: 0; height: 78px; display: flex; background: var(--tabbar-bg); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border-top: 1px solid var(--line); padding-bottom: 14px; z-index: 30; }
   .tab { flex: 1; border: none; background: none; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; color: var(--ink-3); font-family: inherit; font-size: 10px; font-weight: 600; padding-top: 8px; transition: color .18s; }
   .tab svg { width: 23px; height: 23px; }
   .tab.active { color: var(--accent); }
@@ -196,12 +227,12 @@
   .q-opt { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; font-family: inherit; font-size: 14.5px; font-weight: 500; color: var(--ink); background: var(--surface); border: 1.5px solid var(--line-strong); border-radius: 15px; padding: 15px 16px; cursor: pointer; transition: .15s; }
   .q-opt:hover:not(:disabled) { border-color: var(--accent); }
   .q-opt .mk { width: 26px; height: 26px; border-radius: 50%; border: 1.5px solid var(--line-strong); display: grid; place-items: center; font-weight: 700; font-size: 13px; color: var(--ink-3); flex-shrink: 0; }
-  .q-opt.correct { border-color: var(--ok); background: color-mix(in srgb, var(--ok) 12%, var(--surface)); }
+  .q-opt.correct { border-color: var(--ok); background: var(--ok-bg); }
   .q-opt.correct .mk { background: var(--ok); border-color: var(--ok); color: #fff; }
-  .q-opt.wrong { border-color: var(--ng); background: color-mix(in srgb, var(--ng) 12%, var(--surface)); }
+  .q-opt.wrong { border-color: var(--ng); background: var(--ng-bg); }
   .q-opt.wrong .mk { background: var(--ng); border-color: var(--ng); color: #fff; }
   .q-opt:disabled { cursor: default; }
-  .q-exp { margin-top: 18px; border-radius: 15px; padding: 15px 16px; background: var(--accent-soft); border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent); animation: fade .3s ease; }
+  .q-exp { margin-top: 18px; border-radius: 15px; padding: 15px 16px; background: var(--accent-soft); border: 1px solid var(--accent-line); animation: fade .3s ease; }
   .q-exp .verdict { font-weight: 700; font-size: 14px; display: flex; align-items: center; gap: 6px; }
   .q-exp p { font-size: 13px; color: var(--ink); line-height: 1.7; margin-top: 7px; }
 
@@ -244,7 +275,7 @@
   .pin-dot svg { width: 15px; height: 15px; transform: rotate(-45deg); color: #fff; }
   .pin.juku { z-index: 3; }
   .juku-dot { width: 26px; height: 26px; border-radius: 8px; background: var(--sepia); color: #fff; border: 2px solid #fff; display: grid; place-items: center; font-size: 12px; font-weight: 700; font-family: "Zen Old Mincho", serif; box-shadow: 0 3px 8px rgba(0,0,0,.3); transform: translateY(2px); }
-  .juku-lbl { position: absolute; top: 30px; left: 50%; transform: translateX(-50%); white-space: nowrap; font-size: 9px; font-weight: 700; color: var(--sepia); background: color-mix(in srgb, var(--surface) 90%, transparent); padding: 1px 5px; border-radius: 5px; }
+  .juku-lbl { position: absolute; top: 30px; left: 50%; transform: translateX(-50%); white-space: nowrap; font-size: 9px; font-weight: 700; color: var(--sepia); background: var(--surface); padding: 1px 5px; border-radius: 5px; }
   .map-wrap.tall svg.terrain { height: 360px; }
   .map-legend { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 10px; font-size: 11px; color: var(--ink-2); }
   .map-legend span { display: inline-flex; align-items: center; gap: 5px; }
@@ -1142,7 +1173,7 @@ function sheetCourse(c){
       return `<div style="display:flex;gap:14px">
         <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0">
           <div style="width:30px;height:30px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-size:13px;font-weight:700">${i+1}</div>
-          ${last?'':'<div style="width:2px;flex:1;background:color-mix(in srgb,var(--accent) 40%,transparent);min-height:22px"></div>'}
+          ${last?'':'<div style="width:2px;flex:1;background:var(--accent-line);min-height:22px"></div>'}
         </div>
         <div style="padding-bottom:18px">
           ${sp?`<button class="related" data-spot="${sp.id}" style="padding:0;background:none;border:none;margin:0"><h4 style="font-size:15px;font-weight:700;display:inline-flex;align-items:center;gap:4px">${esc(st[1])} <span style="width:13px;color:var(--ink-3)">${I.chev}</span></h4></button>`:`<h4 style="font-size:15px;font-weight:700">${esc(st[1])}</h4>`}
