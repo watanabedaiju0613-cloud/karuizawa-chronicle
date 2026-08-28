@@ -1,6 +1,7 @@
 <meta charset=utf-8>
 <title>軽井沢クロニクル</title>
-<meta name="color-scheme" content="light dark" />
+<meta name="color-scheme" content="light" />
+<script>document.documentElement.setAttribute("data-theme","light");</script>
 <script>
 (function(){
   function show(msg){
@@ -23,7 +24,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <style>
   html { background: #F0EDE4; }
-  @media (prefers-color-scheme: dark) { html:not([data-theme="light"]) { background: #100D09; } }
+  @media (prefers-color-scheme: dark) { html[data-theme="dark"] { background: #100D09; } }
   :root {
     --bg: #E4E1D8;
     --app-bg: #F0EDE4;
@@ -1183,8 +1184,14 @@ function terrainSVG(){
     <path d="M10.9 28 L14 21 L17.1 28 Z" fill="var(--map-line)"/>
 
     <!-- 湯川 -->
-    <path d="M28 44 C42 55 55 61 69 73 C78 80 87 84 100 87"
-          stroke="var(--map-water)" stroke-width="2.1" fill="none" stroke-linecap="round"/>
+    <defs>
+      <linearGradient id="rivFade" x1="0" y1="0" x2="0.42" y2="0.42">
+        <stop offset="0" stop-color="var(--map-water)" stop-opacity="0"/>
+        <stop offset="1" stop-color="var(--map-water)" stop-opacity="1"/>
+      </linearGradient>
+    </defs>
+    <path d="M41 53 C51 59 59 65 69 73 C78 80 87 84 100 87"
+          stroke="url(#rivFade)" stroke-width="2.1" fill="none" stroke-linecap="round"/>
     <ellipse cx="67" cy="65" rx="2.4" ry="3.8" fill="var(--map-water)"/>
     <ellipse cx="56" cy="88" rx="4.2" ry="2.6" fill="var(--map-water)"/>
 
