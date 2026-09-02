@@ -50,10 +50,15 @@
     --ng-bg: #F8E7E2;
     --accent-line: #A8C6B3;
     --tabbar-bg: #FAF8F1;
-    --map-bg: #F8F7F2;
-    --map-land: #EBEEE4;
-    --map-water: #D2E3EE;
-    --map-line: #DCD8CB;
+    --map-bg: #E9F1E1;
+    --map-land: #DCE8CE;
+    --map-water: #A8CCE3;
+    --map-line: #C6D4BA;
+    --map-tree: #5E8C52;
+    --map-tree2: #7CA96C;
+    --map-mount: #93A98F;
+    --map-snow: #F4F7F1;
+    --map-road: #C8A063;
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
@@ -82,10 +87,15 @@
       --ng-bg: #2E1F1B;
       --accent-line: #3A5544;
       --tabbar-bg: #201B14;
-      --map-bg: #14120D;
-      --map-land: #1E211A;
-      --map-water: #1C2B34;
-      --map-line: #2E2B22;
+      --map-bg: #161D14;
+      --map-land: #1E271A;
+      --map-water: #244655;
+      --map-line: #2C3A28;
+      --map-tree: #3E6236;
+      --map-tree2: #4E7844;
+      --map-mount: #4A5A48;
+      --map-snow: #C9D3C4;
+      --map-road: #8A6C3E;
     }
   }
   :root[data-theme="dark"] {
@@ -96,7 +106,8 @@
     --frame: #050403; --shadow: 30px 60px 120px rgba(0,0,0,.6), 0 8px 30px rgba(0,0,0,.45);
     --ok: #5CB37E; --ng: #E0836E;
     --ok-bg: #1E2A22; --ng-bg: #2E1F1B; --accent-line: #3A5544; --tabbar-bg: #201B14;
-    --map-bg: #14120D; --map-land: #1E211A; --map-water: #1C2B34; --map-line: #2E2B22;
+    --map-bg: #161D14; --map-land: #1E271A; --map-water: #244655; --map-line: #2C3A28;
+    --map-tree: #3E6236; --map-tree2: #4E7844; --map-mount: #4A5A48; --map-snow: #C9D3C4; --map-road: #8A6C3E;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -282,26 +293,38 @@
   .map-wrap { position: relative; border-radius: 20px; overflow: hidden; border: 1px solid var(--line); }
   .map-wrap svg.terrain { display: block; width: 100%; height: auto; }
   .map-wrap { background: var(--map-bg); }
-  .pin { position: absolute; transform: translate(-50%, -50%); cursor: pointer; z-index: 2; }
-  .pin.anchor-l { transform: translate(-16px, -50%); }
-  .pin.anchor-r { transform: translate(calc(-100% + 16px), -50%); }
-  .pin-chip { display: flex; align-items: center; gap: 5px; white-space: nowrap;
-    background: var(--surface-2); border: 1px solid var(--map-line);
-    border-radius: 999px; padding: 2.5px 8px 2.5px 2.5px;
-    box-shadow: 0 2px 7px rgba(35,28,16,.16); }
-  .pin-chip i { width: 17px; height: 17px; border-radius: 50%; flex: none;
+  /* ふきだし型ラベル：足元の点が実際の位置 */
+  .pin { position: absolute; width: 0; height: 0; cursor: pointer; z-index: 2; }
+  .pin-lead { position: absolute; left: 50%; bottom: 0; width: 2px;
+    transform: translateX(-50%); background: var(--map-line); border-radius: 2px; }
+  .pin-anchor { position: absolute; left: 50%; bottom: 0; width: 9px; height: 9px;
+    border-radius: 50%; transform: translate(-50%, 50%);
+    border: 2px solid var(--surface-2); box-shadow: 0 1px 3px rgba(20,30,15,.3); }
+  .pin-chip { position: absolute; left: 50%; transform: translateX(-50%);
+    display: flex; align-items: center; gap: 5px; white-space: nowrap;
+    background: var(--surface-2); border-radius: 999px; padding: 3px 9px 3px 3px;
+    box-shadow: 0 2px 8px rgba(25,40,20,.22); }
+  .pin-chip::after { content: ""; position: absolute; left: 50%; bottom: -5px;
+    margin-left: -5px; border: 5px solid transparent; border-top-color: var(--surface-2);
+    border-bottom: 0; }
+  .pin-chip i { width: 18px; height: 18px; border-radius: 50%; flex: none;
     display: grid; place-items: center; font-style: normal; }
   .pin-chip i svg { width: 11px; height: 11px; color: #fff; }
-  .pin-chip b { font-size: 9.5px; font-weight: 700; color: var(--ink); letter-spacing: 0; }
+  .pin-chip b { font-size: 10px; font-weight: 700; color: var(--ink); letter-spacing: 0; }
+  .pin.edge-l .pin-chip { left: 0; transform: none; }
+  .pin.edge-l .pin-chip::after { left: 16px; }
+  .pin.edge-r .pin-chip { left: auto; right: 0; transform: none; }
+  .pin.edge-r .pin-chip::after { left: auto; right: 12px; margin-left: 0; }
   .pin.juku { z-index: 3; }
-  .juku-badge { width: 26px; height: 26px; border-radius: 9px; background: var(--sepia);
+  .juku-badge { position: absolute; left: 50%; bottom: 0; transform: translate(-50%, 50%);
+    width: 25px; height: 25px; border-radius: 9px; background: var(--sepia);
     color: #fff; border: 2px solid var(--surface-2); display: grid; place-items: center;
     font-family: "Zen Old Mincho", serif; font-size: 12px; font-weight: 700;
-    box-shadow: 0 2px 7px rgba(35,28,16,.22); }
-  .pin-dot { width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center;
-    border: 2px solid var(--surface-2); box-shadow: 0 2px 6px rgba(35,28,16,.25); }
-  .pin-dot svg { width: 11px; height: 11px; color: #fff; }
-  .map-wrap.tall svg.terrain { height: 470px; }
+    box-shadow: 0 2px 7px rgba(25,40,20,.28); }
+  .juku-name { position: absolute; left: 50%; bottom: -22px; transform: translateX(-50%);
+    white-space: nowrap; font-size: 8.5px; font-weight: 700; color: #fff;
+    background: var(--sepia); padding: 1px 5px; border-radius: 4px; }
+  .map-wrap.tall svg.terrain { height: 520px; }
   .map-legend { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 10px; font-size: 11px; color: var(--ink-2); }
   .map-legend span { display: inline-flex; align-items: center; gap: 5px; }
   .lg-road { width: 16px; height: 0; border-top: 2px dashed var(--sepia); }
@@ -410,6 +433,7 @@ const I = {
   fork:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 3v7a2 2 0 004 0V3M8 12v9M18 3c-2 0-3 2-3 5s1 4 3 4v9"/></svg>',
   bag:   '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 7h12l1 14H5L6 7z"/></svg>',
   drop:  '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3s6 7 6 11a6 6 0 01-12 0c0-4 6-11 6-11z"/></svg>',
+  golf:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M8.5 20.5V3.5"/><path d="M8.5 4.2 L17.5 7.2 L8.5 10.2 Z" fill="currentColor" stroke="none"/><ellipse cx="8.5" cy="20.6" rx="4.2" ry="1.4" fill="currentColor" stroke="none" opacity=".4"/></svg>',
   mtn:   '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l5 9-3 0-2-3-2 3-3 0zM3 20l4-7 3 4-2 3zM21 20l-4-7-3 4 2 3z"/></svg>',
   sign:  '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M11 2h2v3h6l2 3-2 3h-6v11h-2V11H5L3 8l2-3h6z"/></svg>',
   bldg:  '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 21V5l8-3 8 3v16h-6v-5h-4v5z"/></svg>',
@@ -438,6 +462,7 @@ const CAT = {
   gourmet:{label:"グルメ・カフェ",icon:I.fork,color:"#C0611F"},
   shopping:{label:"ショッピング",icon:I.bag,color:"#C13B6B"},
   onsen:{label:"温泉",icon:I.drop,color:"#2E86A8"},
+  golf:{label:"ゴルフ",icon:I.golf,color:"#0F766E"},
 };
 
 /* ---------------- SPOTS (tourism retained) ---------------- */
@@ -454,6 +479,7 @@ const SPOTS = [
   {id:"stone",name:"石の教会 内村鑑三記念堂",reading:"いしのきょうかい",cat:"church",area:"中軽井沢",summary:"内村鑑三を記念するオーガニック建築",lat:36.34860,lon:138.59050,season:"通年",desc:"「無教会主義」を唱えた思想家・内村鑑三の精神を記念して建てられた教会。石のアーチとガラスが連なる独特の空間が、自然の光と緑を内部に取り込みます。",tips:"地下に内村鑑三の資料展示。"},
   {id:"prince",name:"軽井沢・プリンスショッピングプラザ",reading:"ぷりんすしょっぴんぐぷらざ",cat:"shopping",area:"南軽井沢",summary:"軽井沢駅すぐの大規模アウトレット",lat:36.33890,lon:138.63490,season:"通年",desc:"軽井沢駅南口に隣接する国内最大級のアウトレット。広大な芝生広場や池を配した開放的なつくりで、駅直結でアクセス抜群です。",tips:"1997年の新幹線開業で駅前が発展。"},
   {id:"taliesin",name:"軽井沢タリアセン",reading:"かるいざわたりあせん",cat:"history",area:"南軽井沢",summary:"塩沢湖畔に歴史的建造物が点在する公園",lat:36.32300,lon:138.60300,season:"初夏・紅葉",desc:"塩沢湖を囲む自然公園。旧軽井沢から移築された「旧朝吹山荘（睡鳩荘）」など、別荘建築を間近に見られます。",tips:"睡鳩荘の内部見学は必見。"},
+  {id:"golf72",name:"軽井沢72ゴルフ",reading:"かるいざわななじゅうにごるふ",cat:"golf",area:"南軽井沢",summary:"浅間山を望む、国内最大級のゴルフリゾート",lat:36.31400,lon:138.58700,season:"新緑・紅葉",desc:"1971年（昭和46年）開場。西武グループが南軽井沢の原野を開発した大規模ゴルフリゾートで、名称は開場時に72ホールを備えていたことに由来します。現在は北・東（入山／押立）・西（ゴールド／ブルー）・南の6コース108ホール。西コースを設計したのは米国の名匠ロバート・トレント・ジョーンズで、湿地を含む土地に多くの池を配し排水を改良する手法が用いられました。パブリックコースとして一般の利用ができます。",tips:"前身は1956年開場の南軽井沢ゴルフ場（9ホール）。"},
 ];
 const spotById = id => SPOTS.find(s=>s.id===id);
 
@@ -1099,116 +1125,167 @@ function currentSpotList(){ const q=spotQuery.trim(); let l=SPOTS; if(spotFilter
 const SHORT_NAME = {
   kumoba:"雲場池", ginza:"旧軽銀座", stpaul:"聖パウロ教会", shaw:"ショー礼拝堂",
   mampei:"万平ホテル", usui:"見晴台", shiraito:"白糸の滝", onioshi:"鬼押出し園",
-  harunire:"ハルニレ", stone:"石の教会", prince:"プリンス", taliesin:"タリアセン"
+  harunire:"ハルニレ", stone:"石の教会", prince:"プリンス", taliesin:"タリアセン",
+  golf72:"72ゴルフ"
 };
+const MAP_POS = {
+  onioshi:[16,10], shiraito:[44,22], usui:[86,22], shaw:[68,35],
+  stpaul:[88,45], harunire:[22,47], ginza:[66,55], stone:[20,62],
+  mampei:[86,62], kumoba:[52,68], taliesin:[34,76], prince:[82,80],
+  golf72:[58,89]
+};
+const KAIDO_POS = [[8,90],[28,85],[52,79],[74,70]];
 function placePins(){
   const layer=el("pinLayer"); if(!layer) return;
-  const MAPW = 360;
+  const MAPW=360, MAPH=520;
+  const CH=24/MAPH*100, GAP=13/MAPH*100;
   const placed=[];
-  function widthPct(label){ return ((label.length*9.6)+36) / MAPW * 100; }
-  function free(x,y,w){
+  function wPct(l){ return ((l.length*10.4)+42)/MAPW*100; }
+  function fits(x,yTop,w){
     return !placed.some(function(q){
-      return Math.abs(q.x-x) < (q.w+w)/2 && Math.abs(q.y-y) < 5.4;
+      return Math.abs(q.x-x) < (q.w+w)/2 && Math.abs(q.y-yTop) < CH*1.05;
     });
   }
-  function take(x,y,w){ placed.push({x:x,y:y,w:w}); }
-  function side(x){ return x<24 ? " anchor-l" : (x>76 ? " anchor-r" : ""); }
-
-  // 宿場：コンパクトなバッジ（位置は動かさない）
+  function edge(x,w){
+    if(x-w/2 < 1) return " edge-l";
+    if(x+w/2 > 99) return " edge-r";
+    return "";
+  }
   const juku = KAIDO.map(function(k,i){
-    const x=projX(k.lon), y=projY(k.lat);
-    take(x,y,7.6);
-    return '<div class="pin juku" style="left:'+x+'%;top:'+y+'%" data-juku="'+i+'" title="'+esc(k.name)+'">'
-      +'<div class="juku-badge">宿</div></div>';
+    const pos=KAIDO_POS[i]||[projX(k.lon),projY(k.lat)];
+    placed.push({x:pos[0], y:pos[1]-CH*0.9, w:10});
+    return '<div class="pin juku" style="left:'+pos[0]+'%;top:'+pos[1]+'%" data-juku="'+i+'">'
+      +'<div class="juku-badge">宿</div><div class="juku-name">'+esc(k.name)+'</div></div>';
   }).join("");
 
-  // スポット：余裕があれば名前つきラベル、混み合う場所は丸ピン
   const items = currentSpotList().map(function(sp){
-    return {sp:sp, x:projX(sp.lon), y:projY(sp.lat), label:(SHORT_NAME[sp.id]||sp.name)};
+    const pos = MAP_POS[sp.id] || [projX(sp.lon), projY(sp.lat)];
+    return {sp:sp, x:pos[0], y:pos[1], label:(SHORT_NAME[sp.id]||sp.name)};
   }).sort(function(a,b){ return a.y-b.y; });
 
   const spots = items.map(function(it){
-    const sp=it.sp, c=CAT[sp.cat].color, w=widthPct(it.label);
-    let y=it.y, labelled=false;
-    if(free(it.x,y,w)) { labelled=true; }
-    else if(y+5.2<=92 && free(it.x,y+5.2,w)) { y=y+5.2; labelled=true; }
-    else if(y+10.4<=92 && free(it.x,y+10.4,w)) { y=y+10.4; labelled=true; }
-    if(labelled){
-      take(it.x,y,w);
-      return '<div class="pin'+side(it.x)+'" style="left:'+it.x+'%;top:'+y+'%" data-spot="'+sp.id+'">'
-        +'<div class="pin-chip"><i style="background:'+c+'">'+ic(CAT[sp.cat].icon,'#fff',11)+'</i>'
-        +'<b>'+esc(it.label)+'</b></div></div>';
+    const sp=it.sp, c=CAT[sp.cat].color, w=wPct(it.label);
+    let lift=GAP, yTop=it.y-GAP-CH;
+    for(let k=0;k<12;k++){
+      if(fits(it.x,yTop,w) && yTop>1) break;
+      lift += CH*1.1; yTop = it.y-lift-CH;
+      if(yTop<1){ lift=GAP; yTop=it.y-GAP-CH; break; }
     }
-    // 丸ピン：他のピンに隠れる場合だけ最小限ずらす
-    function clearAt(cx,cy){
-      return !placed.some(function(q){
-        return Math.abs(q.x-cx) < (q.w+5.2)/2 && Math.abs(q.y-cy) < 4.6;
-      });
-    }
-    const OFFS=[[0,0],[0,4.6],[0,-4.6],[3.8,3],[-3.8,3],[3.8,-3],[-3.8,-3],
-                [0,9.2],[0,-9.2],[6.6,0],[-6.6,0],[6.6,5],[-6.6,5],[6.6,-5],[-6.6,-5],
-                [0,13.8],[9.5,0],[-9.5,0],[9.5,8],[-9.5,8]];
-    let px=it.x, py=it.y, found=false;
-    for(let k=0;k<OFFS.length;k++){
-      const cx=it.x+OFFS[k][0], cy=it.y+OFFS[k][1];
-      if(cy<4||cy>94) continue;
-      if(clearAt(cx,cy)){ px=cx; py=cy; found=true; break; }
-    }
-    if(!found){ // 最後の手段：空くまで下へ
-      let cy=it.y;
-      for(let k=0;k<24 && !clearAt(it.x,cy);k++) cy+=4.8;
-      px=it.x; py=Math.min(94,cy);
-    }
-    px=Math.max(5,Math.min(95,px)); py=Math.max(4,Math.min(94,py));
-    take(px,py,5.2);
-    return '<div class="pin dot" style="left:'+px+'%;top:'+py+'%" data-spot="'+sp.id+'" title="'+esc(sp.name)+'">'
-      +'<div class="pin-dot" style="background:'+c+'">'+ic(CAT[sp.cat].icon,'#fff',11)+'</div></div>';
+    placed.push({x:it.x, y:yTop, w:w});
+    const leadPx=Math.round(lift/100*MAPH);
+    return '<div class="pin'+edge(it.x,w)+'" style="left:'+it.x+'%;top:'+it.y+'%" data-spot="'+sp.id+'">'
+      +'<span class="pin-lead" style="height:'+leadPx+'px"></span>'
+      +'<span class="pin-anchor" style="background:'+c+'"></span>'
+      +'<div class="pin-chip" style="bottom:'+leadPx+'px"><i style="background:'+c+'">'
+      +ic(CAT[sp.cat].icon,'#fff',11)+'</i><b>'+esc(it.label)+'</b></div></div>';
   }).join("");
-
   layer.innerHTML = juku + spots;
 }
 function kaidoRoute(){
-  return KAIDO.map((k,i)=>`${i?'L':'M'} ${projX(k.lon).toFixed(1)} ${projY(k.lat).toFixed(1)}`).join(" ");
+  return KAIDO_POS.map(function(p,i){ return (i?'L':'M')+' '+p[0]+' '+p[1]; }).join(' ');
+}
+function treesSVG(){
+  // 決定的な擬似乱数で木立を配置（ラベル・イラストの上に載らないよう領域を避ける）
+  let seed = 20260826;
+  const rnd = function(){ seed = (seed*1664525 + 1013904223) % 4294967296; return seed/4294967296; };
+  const avoid = [];
+  Object.keys(MAP_POS).forEach(function(k){
+    const q = MAP_POS[k]; avoid.push([q[0]-17, q[1]-14, q[0]+17, q[1]+3]);
+  });
+  KAIDO_POS.forEach(function(q){ avoid.push([q[0]-10, q[1]-5, q[0]+10, q[1]+9]); });
+  avoid.push([2,12,38,50], [36,20,54,36], [84,30,100,38], [44,86,72,96],
+             [30,54,52,62], [60,4,86,12], [80,84,98,94], [0,60,20,72]);
+  const busy = function(x,y){
+    return avoid.some(function(b){ return x>=b[0] && x<=b[2] && y>=b[1] && y<=b[3]; });
+  };
+  const put=[], out=[];
+  let guard=0;
+  while(put.length<30 && guard<4000){
+    guard++;
+    const x = 3 + rnd()*94, y = 5 + rnd()*88;
+    if(busy(x,y)) continue;
+    if(put.some(function(t){ return Math.abs(t[0]-x)<7.5 && Math.abs(t[1]-y)<6.5; })) continue;
+    const kind = [0,1,1,2][Math.floor(rnd()*4)];
+    put.push([x,y,kind]);
+  }
+  put.forEach(function(t){
+    const x=t[0], y=t[1], kind=t[2];
+    const h = kind===0 ? 5.0 : (kind===1 ? 6.2 : 7.2);
+    const w = kind===0 ? 2.4 : (kind===1 ? 2.8 : 3.1);
+    const col = kind===0 ? "var(--map-tree2)" : "var(--map-tree)";
+    out.push('<g><rect x="'+(x-0.35).toFixed(1)+'" y="'+y.toFixed(1)+'" width="0.7" height="1.5" fill="var(--map-road)" opacity=".5"/>'
+      +'<path d="M'+x.toFixed(1)+' '+(y-h).toFixed(1)+' L'+(x-w).toFixed(1)+' '+(y+0.2).toFixed(1)+' L'+(x+w).toFixed(1)+' '+(y+0.2).toFixed(1)+' Z" fill="'+col+'"/>'
+      +'<path d="M'+x.toFixed(1)+' '+(y-h-0.2).toFixed(1)+' L'+(x-w*0.62).toFixed(1)+' '+(y-h*0.42).toFixed(1)+' L'+(x+w*0.62).toFixed(1)+' '+(y-h*0.42).toFixed(1)+' Z" fill="'+col+'" opacity=".75"/></g>');
+  });
+  return out.join("");
 }
 function terrainSVG(){
   return `<svg class="terrain" viewBox="0 0 100 96" preserveAspectRatio="none">
-    <rect width="100" height="96" fill="var(--map-bg)"/>
-
-    <!-- 高原・森林の面 -->
-    <path d="M0 0 H100 V30 C80 38 62 28 44 38 C28 47 13 42 0 48 Z" fill="var(--map-land)"/>
-    <ellipse cx="74" cy="64" rx="25" ry="15" fill="var(--map-land)" opacity=".8"/>
-    <ellipse cx="34" cy="82" rx="24" ry="12" fill="var(--map-land)" opacity=".6"/>
-
-    <!-- 浅間山 -->
-    <path d="M5 38 L14 21 L23 38 Z" fill="var(--map-land)" stroke="var(--map-line)" stroke-width="1"/>
-    <path d="M10.9 28 L14 21 L17.1 28 Z" fill="var(--map-line)"/>
-
-    <!-- 湯川 -->
     <defs>
       <linearGradient id="rivFade" x1="0" y1="0" x2="0.42" y2="0.42">
         <stop offset="0" stop-color="var(--map-water)" stop-opacity="0"/>
         <stop offset="1" stop-color="var(--map-water)" stop-opacity="1"/>
       </linearGradient>
     </defs>
-    <path d="M41 53 C51 59 59 65 69 73 C78 80 87 84 100 87"
-          stroke="url(#rivFade)" stroke-width="2.1" fill="none" stroke-linecap="round"/>
-    <ellipse cx="67" cy="65" rx="2.4" ry="3.8" fill="var(--map-water)"/>
-    <ellipse cx="56" cy="88" rx="4.2" ry="2.6" fill="var(--map-water)"/>
 
-    <!-- 鉄道（新幹線・しなの鉄道） -->
-    <path d="M12 63 C40 67 64 71 100 77" stroke="var(--map-line)" stroke-width="1.8" fill="none"/>
-    <path d="M12 63 C40 67 64 71 100 77" stroke="var(--map-bg)" stroke-width=".8" fill="none" stroke-dasharray="2.2 2.6"/>
+    <rect width="100" height="96" fill="var(--map-bg)"/>
+    <path d="M0 0 H100 V26 C82 34 64 24 46 34 C30 43 14 38 0 44 Z" fill="var(--map-land)"/>
+    <ellipse cx="76" cy="62" rx="26" ry="16" fill="var(--map-land)" opacity=".85"/>
+    <ellipse cx="30" cy="84" rx="26" ry="13" fill="var(--map-land)" opacity=".7"/>
+
+    <!-- 浅間山 -->
+    <path d="M2 44 L19 15 L36 44 Z" fill="var(--map-mount)"/>
+    <path d="M13.5 25 L19 15 L24.5 25 L21 22.5 L19 24.5 L16.5 22 Z" fill="var(--map-snow)"/>
+    <ellipse cx="19" cy="12" rx="4.6" ry="2.1" fill="var(--map-snow)" opacity=".8"/>
+    <ellipse cx="23.5" cy="10" rx="3" ry="1.5" fill="var(--map-snow)" opacity=".6"/>
+
+    <!-- 白糸の滝 -->
+    <rect x="40.2" y="23.5" width="7.6" height="3.8" rx="1.3" fill="var(--map-mount)" opacity=".55"/>
+    <g stroke="var(--map-snow)" stroke-width=".7" stroke-linecap="round" opacity=".95">
+      <line x1="41.6" y1="27" x2="41.6" y2="32"/><line x1="43.2" y1="27" x2="43.2" y2="33"/>
+      <line x1="44.8" y1="27" x2="44.8" y2="32"/><line x1="46.4" y1="27" x2="46.4" y2="33"/>
+    </g>
+
+    <!-- 川・池 -->
+    <path d="M41 53 C51 59 59 65 69 73 C78 80 87 84 100 87"
+          stroke="url(#rivFade)" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+    <path d="M0 66 C14 62 26 66 38 62" stroke="var(--map-water)" stroke-width="2.1" fill="none" stroke-linecap="round"/>
+    <ellipse cx="52" cy="71.5" rx="3" ry="4.2" fill="var(--map-water)"/>
+    <ellipse cx="34" cy="80" rx="4.6" ry="2.6" fill="var(--map-water)"/>
+    <!-- 72ゴルフのフェアウェイ -->
+    <ellipse cx="57" cy="92" rx="11" ry="4.2" fill="var(--map-tree2)" opacity=".38"/>
+    <ellipse cx="50.5" cy="91" rx="1.5" ry="1.1" fill="var(--map-water)" opacity=".8"/>
+    <g><line x1="62" y1="92" x2="62" y2="87.4" stroke="var(--map-mount)" stroke-width=".55"/><path d="M62 87.4 L65 88.3 L62 89.2 Z" fill="#C0392B"/></g>
+
+    <!-- 鉄道 -->
+    <path d="M10 62 C40 66 64 70 100 76" stroke="var(--map-line)" stroke-width="1.7" fill="none"/>
+    <path d="M10 62 C40 66 64 70 100 76" stroke="var(--map-bg)" stroke-width=".8" fill="none" stroke-dasharray="2 2.6"/>
 
     <!-- 旧中山道 -->
-    <path d="${kaidoRoute()}" stroke="var(--sepia)" stroke-width="1.6" fill="none"
-          stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="3 2.4" opacity=".9"/>
+    <path d="${kaidoRoute()}" stroke="var(--map-road)" stroke-width="3.4" fill="none"
+          stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="${kaidoRoute()}" stroke="var(--map-snow)" stroke-width="1" fill="none"
+          stroke-linecap="butt" stroke-linejoin="round" stroke-dasharray="2.4 3"/>
+
+    <!-- 木立 -->
+    ${treesSVG()}
+
+    <!-- 建物のあしらい -->
+    <g>
+      <path d="M75.5 46 L79 41.6 L82.5 46 Z" fill="#B4593F"/>
+      <rect x="76.5" y="46" width="5" height="3.8" fill="var(--map-snow)"/>
+      <path d="M10.5 65.5 L13.5 62 L16.5 65.5 Z" fill="#8C6BA8"/>
+      <rect x="11.5" y="65.5" width="4" height="3.4" fill="var(--map-snow)"/>
+      <rect x="74" y="63.5" width="6" height="4" fill="var(--map-snow)"/>
+      <path d="M73.2 63.5 L77 60 L80.8 63.5 Z" fill="var(--map-road)"/>
+    </g>
 
     <!-- 地名 -->
-    <text x="14" y="42.5" font-size="2.7" fill="var(--ink-3)" text-anchor="middle" font-family="sans-serif">浅間山</text>
-    <text x="66" y="16" font-size="2.7" fill="var(--ink-3)" text-anchor="middle" font-family="sans-serif">北軽井沢</text>
-    <text x="38" y="79" font-size="2.7" fill="var(--ink-3)" text-anchor="middle" font-family="sans-serif">中軽井沢</text>
-    <text x="86" y="55" font-size="2.7" fill="var(--ink-3)" text-anchor="middle" font-family="sans-serif">旧軽井沢</text>
-    <text x="46" y="94" font-size="2.7" fill="var(--ink-3)" text-anchor="middle" font-family="sans-serif">南軽井沢</text>
+    <text x="72" y="9" font-size="2.9" fill="var(--ink-3)" text-anchor="middle" font-family="sans-serif">北軽井沢</text>
+    <text x="19" y="50" font-size="2.9" fill="var(--ink-3)" text-anchor="middle" font-family="sans-serif">浅間山</text>
+    <text x="40" y="59" font-size="2.9" fill="var(--ink-3)" text-anchor="middle" font-family="sans-serif">中軽井沢</text>
+    <text x="93" y="34" font-size="2.9" fill="var(--ink-3)" text-anchor="middle" font-family="sans-serif">旧軽井沢</text>
+    <text x="88" y="90" font-size="2.9" fill="var(--ink-3)" text-anchor="middle" font-family="sans-serif">南軽井沢</text>
   </svg>`;
 }
 function jukuSheet(k){
